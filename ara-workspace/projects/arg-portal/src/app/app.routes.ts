@@ -101,10 +101,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./ara/report-repository/report-repository').then(m => m.ReportRepositoryComponent)
       },
+      { path: 'ara/feeds', redirectTo: 'ara/feeds/abacus', pathMatch: 'full' },
       {
-        path: 'ara/feeds',
+        path: 'ara/feeds/:feedType',
         loadComponent: () =>
-          import('./ara/feeds/feeds').then(m => m.FeedsComponent)
+          import('./ara/feeds/feed-recon').then(m => m.FeedReconComponent)
       },
 
       // ── Settings ─────────────────────────────────────────────────────

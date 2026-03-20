@@ -24,8 +24,9 @@ export class SideNavComponent {
   profileMenuOpen = signal(false);
 
   // Collapsible group state
-  araMainOpen  = signal(true);
+  araMainOpen    = signal(true);
   exceptionsOpen = signal(false);
+  feedsOpen      = signal(false);
 
   // ── ARA Neural ───────────────────────────────────────────────────
   readonly neuralItems: NavLink[] = [
@@ -63,8 +64,15 @@ export class SideNavComponent {
 
   // ── ARA other items ──────────────────────────────────────────────
   readonly araOtherItems: NavLink[] = [
-    { label: 'Report Repository', route: '/ara/report-repository' },
-    { label: 'Feeds',             route: '/ara/feeds'             }
+    { label: 'Report Repository', route: '/ara/report-repository' }
+  ];
+
+  // ── Feeds sub-items ──────────────────────────────────────────────
+  readonly feedItems: NavLink[] = [
+    { label: 'ARA Abacus Feed', route: '/ara/feeds/abacus' },
+    { label: 'RF Feed',        route: '/ara/feeds/rf'     },
+    { label: 'DSMT Feed',      route: '/ara/feeds/dsmt'   },
+    { label: 'Fails Feed',     route: '/ara/feeds/fails'  },
   ];
 
   // ── Settings ─────────────────────────────────────────────────────
@@ -74,6 +82,7 @@ export class SideNavComponent {
 
   toggleAraMain(): void    { this.araMainOpen.update(v => !v); }
   toggleExceptions(): void { this.exceptionsOpen.update(v => !v); }
+  toggleFeeds(): void      { this.feedsOpen.update(v => !v); }
   onToggle(): void         { this.toggleCollapse.emit(); }
 
   toggleProfileMenu(): void { this.profileMenuOpen.update(v => !v); }

@@ -1,0 +1,285 @@
+<ara-page-header [breadcrumbs]="breadcrumbs" [title]="araDataset().feedName">
+  <div class="fr-header-actions">
+    <span class="fr-feed-badge" [class]="datasetStatusClass(araDataset().status)">
+      {{ araDataset().status }}
+    </span>
+  </div>
+</ara-page-header>
+
+<!-- ════════════════════════════════════════════════════════
+     WORKSPACE — two-panel intake bar
+════════════════════════════════════════════════════════ -->
+<div class="fr-workspace">
+
+  <!-- LEFT: ARA dataset card -->
+  <div class="fr-panel fr-panel--ara">
+    <div class="fr-panel__header">
+      <span class="fr-panel__icon">◈</span>
+      <span class="fr-panel__title">ARA Dataset</span>
+    </div>
+
+    <div class="fr-ds-meta">
+      <div class="fr-ds-name">{{ araDataset().feedName }}</div>
+      <div class="fr-ds-desc">{{ araDataset().description }}</div>
+
+      <div class="fr-ds-grid">
+        <div class="fr-ds-cell">
+          <div class="fr-ds-label">Source</div>
+          <div class="fr-ds-value">{{ araDataset().sourceType }}</div>
+        </div>
+        <div class="fr-ds-cell">
+          <div class="fr-ds-label">Records</div>
+          <div class="fr-ds-value">{{ araDataset().rowCount | number }}</div>
+        </div>
+        <div class="fr-ds-cell">
+          <div class="fr-ds-label">Last Loaded</div>
+          <div class="fr-ds-value">{{ araDataset().lastLoaded }}</div>
+        </div>
+        <div class="fr-ds-cell">
+          <div class="fr-ds-label">Region</div>
+          <div class="fr-ds-value">{{ araDataset().region }}</div>
+        </div>
+        <div class="fr-ds-cell fr-ds-cell--wide">
+          <div class="fr-ds-label">Batch ID</div>
+          <div class="fr-ds-value fr-ds-value--mono">{{ araDataset().batchId }}</div>
+        </div>
+        <div class="fr-ds-cell fr-ds-cell--wide">
+          <div class="fr-ds-label">Key Field</div>
+          <div class="fr-ds-value">{{ compareKey[araDataset().feedType] }}</div>
+        </div>
+        <div class="fr-ds-cell fr-ds-cell--wide">
+          <div class="fr-ds-label">Compared Fields</div>
+          <div class="fr-ds-value">{{ compareFields[araDataset().feedType] }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER: action column -->
+  <div class="fr-action-col">
+    <div class="fr-action-arrows">
+      <span class="fr-arrow">⇆</span>
+    </div>
+    <button
+      class="fr-run-btn"
+      [class.fr-run-btn--active]="canRun()"
+      [class.fr-run-btn--running]="running()"
+      [disabled]="!canRun()"
+      (click)="runComparison()"
+    >
+      @if (running()) {
+        <span class="fr-run-spinner"></span>
+        Reconciling…
+      } @else {
+        <span class="fr-run-icon">▶</span>
+        Run Comparison
+      }
+    </button>
+    @if (ran()) {
+      <button class="fr-reset-btn" (click)="reset()">↺ Reset</button>
+    }
+  </div>
+
+  <!-- RIGHT: source upload panel -->
+  <div class="fr-panel fr-panel--source">
+    <div class="fr-panel__header">
+      <span class="fr-panel__icon">⬆</span>
+      <span class="fr-panel__title">Source File</span>
+    </div>
+
+    @if (!uploadedFile()) {
+      <div class="fr-drop-zone" (click)="triggerUpload()">
+        <div class="fr-drop-icon">↑</div>
+        <div class="fr-drop-main">Click to select source file</div>
+        <div class="fr-drop-sub">CSV · XLSX · TXT · DAT supported</div>
+      </div>
+    } @else {
+      <div class="fr-file-card">
+        <div class="fr-file-icon">📄</div>
+        <div class="fr-file-info">
+          <div class="fr-file-name">{{ uploadedFile()!.name }}</div>
+          <div class="fr-file-stats">
+            {{ uploadedFile()!.rows | number }} rows ·
+            {{ formatSize(uploadedFile()!.sizeKb) }} ·
+            {{ uploadedFile()!.encoding }} · {{ uploadedFile()!.uploadedAt }}
+          </div>
+        </div>
+        <button class="fr-file-remove" (click)="clearUpload()">✕</button>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     RECONCILING INDICATOR
+════════════════════════════════════════════════════════ -->
+@if (running()) {
+  <div class="fr-running-bar">
+    <div class="fr-running-beam"></div>
+    <span class="fr-running-label">Reconciling records against ARA dataset…</span>
+    <span class="fr-running-dots"><span></span><span></span><span></span></span>
+  </div>
+}
+
+<!-- ════════════════════════════════════════════════════════
+     SUMMARY KPIs
+════════════════════════════════════════════════════════ -->
+@if (summary(); as s) {
+  <div class="fr-summary">
+    <div class="fr-kpi fr-kpi--neutral">
+      <div class="fr-kpi__val">{{ s.totalAra | number }}</div>
+      <div class="fr-kpi__lbl">ARA Records</div>
+    </div>
+    <div class="fr-kpi fr-kpi--neutral">
+      <div class="fr-kpi__val">{{ s.totalSource | number }}</div>
+      <div class="fr-kpi__lbl">Source Records</div>
+    </div>
+    <div class="fr-kpi fr-kpi--matched">
+      <div class="fr-kpi__val">{{ s.matched | number }}</div>
+      <div class="fr-kpi__lbl">Matched</div>
+    </div>
+    <div class="fr-kpi" [class.fr-kpi--warn]="s.missingInAra > 0" [class.fr-kpi--ok]="s.missingInAra === 0">
+      <div class="fr-kpi__val">{{ s.missingInAra | number }}</div>
+      <div class="fr-kpi__lbl">Missing in ARA</div>
+    </div>
+    <div class="fr-kpi" [class.fr-kpi--warn]="s.missingInSource > 0" [class.fr-kpi--ok]="s.missingInSource === 0">
+      <div class="fr-kpi__val">{{ s.missingInSource | number }}</div>
+      <div class="fr-kpi__lbl">Missing in Source</div>
+    </div>
+    <div class="fr-kpi" [class.fr-kpi--err]="s.mismatched > 0" [class.fr-kpi--ok]="s.mismatched === 0">
+      <div class="fr-kpi__val">{{ s.mismatched | number }}</div>
+      <div class="fr-kpi__lbl">Mismatched</div>
+    </div>
+    <div class="fr-kpi" [class.fr-kpi--err]="s.exceptions > 0" [class.fr-kpi--ok]="s.exceptions === 0">
+      <div class="fr-kpi__val">{{ s.exceptions | number }}</div>
+      <div class="fr-kpi__lbl">Exceptions</div>
+    </div>
+  </div>
+}
+
+<!-- ════════════════════════════════════════════════════════
+     RESULTS GRID
+════════════════════════════════════════════════════════ -->
+@if (ran()) {
+  <div class="fr-results">
+    <!-- toolbar -->
+    <div class="fr-results__toolbar">
+      <span class="fr-results__title">Reconciliation Results</span>
+      <div class="fr-filter-pills">
+        @for (st of statuses; track st) {
+          <button
+            class="fr-pill"
+            [class.fr-pill--active]="statusFilter() === st"
+            (click)="statusFilter.set(st)"
+          >{{ st }}</button>
+        }
+      </div>
+    </div>
+
+    <!-- table -->
+    <div class="fr-table-wrap">
+      <table class="fr-table">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>{{ compareKey[araDataset().feedType] }}</th>
+            <th>ARA Value</th>
+            <th>Source Value</th>
+            <th>Diff Type</th>
+            <th>Region</th>
+            <th>Comments</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of filteredResults(); track row.id) {
+            <tr class="fr-row" [class]="statusClass(row.status)" (click)="selectRow(row)">
+              <td>
+                <span class="fr-status-badge" [class]="statusClass(row.status)">
+                  {{ row.status }}
+                </span>
+              </td>
+              <td class="fr-cell--mono">{{ row.keyRef }}</td>
+              <td>{{ row.araValue }}</td>
+              <td>{{ row.sourceValue }}</td>
+              <td>{{ row.diffType }}</td>
+              <td>{{ row.region }}</td>
+              <td class="fr-cell--comment">{{ row.comments || '—' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="fr-table__empty">No rows match the selected filter.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+<!-- ════════════════════════════════════════════════════════
+     DETAIL DRAWER
+════════════════════════════════════════════════════════ -->
+<div class="fr-drawer-overlay" [class.fr-drawer-overlay--open]="drawerOpen()" (click)="closeDrawer()"></div>
+
+<div class="fr-drawer" [class.fr-drawer--open]="drawerOpen()">
+  @if (selectedRow(); as row) {
+    <div class="fr-drawer__header">
+      <div class="fr-drawer__title">{{ row.keyRef }}</div>
+      <span class="fr-status-badge" [class]="statusClass(row.status)">{{ row.status }}</span>
+      <button class="fr-drawer__close" (click)="closeDrawer()">✕</button>
+    </div>
+
+    <div class="fr-drawer__body">
+      <!-- diff section -->
+      <div class="fr-drawer__section-label">Diff Summary</div>
+      <div class="fr-drawer__diff-grid">
+        <div class="fr-drawer__diff-cell fr-drawer__diff-cell--label">Diff Type</div>
+        <div class="fr-drawer__diff-cell">{{ row.diffType }}</div>
+        <div class="fr-drawer__diff-cell fr-drawer__diff-cell--label">Feed</div>
+        <div class="fr-drawer__diff-cell">{{ row.feedName }}</div>
+        <div class="fr-drawer__diff-cell fr-drawer__diff-cell--label">Region</div>
+        <div class="fr-drawer__diff-cell">{{ row.region }}</div>
+        <div class="fr-drawer__diff-cell fr-drawer__diff-cell--label">Load Date</div>
+        <div class="fr-drawer__diff-cell">{{ row.loadDate }}</div>
+        @if (row.comments) {
+          <div class="fr-drawer__diff-cell fr-drawer__diff-cell--label">Comments</div>
+          <div class="fr-drawer__diff-cell">{{ row.comments }}</div>
+        }
+      </div>
+
+      <!-- side-by-side snapshots -->
+      <div class="fr-drawer__section-label">Record Snapshots</div>
+      <div class="fr-snap-grid">
+        <div class="fr-snap-col">
+          <div class="fr-snap-col__header">ARA</div>
+          @for (k of snapshotKeys(row.araSnapshot); track k) {
+            <div class="fr-snap-row">
+              <div class="fr-snap-key">{{ k }}</div>
+              <div class="fr-snap-val" [class.fr-snap-val--diff]="row.araSnapshot[k] !== row.srcSnapshot[k]">
+                {{ row.araSnapshot[k] }}
+              </div>
+            </div>
+          }
+          @if (snapshotKeys(row.araSnapshot).length === 0) {
+            <div class="fr-snap-empty">Not present in ARA</div>
+          }
+        </div>
+        <div class="fr-snap-divider"></div>
+        <div class="fr-snap-col">
+          <div class="fr-snap-col__header">Source</div>
+          @for (k of snapshotKeys(row.srcSnapshot); track k) {
+            <div class="fr-snap-row">
+              <div class="fr-snap-key">{{ k }}</div>
+              <div class="fr-snap-val" [class.fr-snap-val--diff]="row.araSnapshot[k] !== row.srcSnapshot[k]">
+                {{ row.srcSnapshot[k] }}
+              </div>
+            </div>
+          }
+          @if (snapshotKeys(row.srcSnapshot).length === 0) {
+            <div class="fr-snap-empty">Not present in Source</div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
