@@ -19,19 +19,63 @@
   </div>
 
   <!-- ═══ User Profile ════════════════════════════════════════════════ -->
-  @if (!collapsed()) {
-    <div class="side-nav__profile">
-      <div class="side-nav__avatar">AT</div>
-      <div class="side-nav__profile-info">
-        <span class="side-nav__profile-name">Aravind Thangaraj</span>
-        <span class="side-nav__profile-role">Operations Analyst</span>
+  <div class="side-nav__profile-wrap">
+    @if (!collapsed()) {
+      <button class="side-nav__profile" (click)="toggleProfileMenu()" [class.side-nav__profile--open]="profileMenuOpen()">
+        <div class="side-nav__avatar">AT</div>
+        <div class="side-nav__profile-info">
+          <span class="side-nav__profile-name">Aravind Thangaraj</span>
+          <span class="side-nav__profile-role">Operations Analyst</span>
+        </div>
+        <svg class="side-nav__profile-chevron" viewBox="0 0 12 12" fill="none" [class.side-nav__profile-chevron--up]="profileMenuOpen()">
+          <path d="M2 4.5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    } @else {
+      <button class="side-nav__profile side-nav__profile--collapsed" (click)="toggleProfileMenu()" [class.side-nav__profile--open]="profileMenuOpen()" title="Aravind Thangaraj / Operations Analyst">
+        <div class="side-nav__avatar">AT</div>
+      </button>
+    }
+
+    @if (profileMenuOpen()) {
+      <div class="side-nav__profile-menu" [class.side-nav__profile-menu--collapsed]="collapsed()">
+        <div class="side-nav__profile-menu-header">Theme</div>
+        <button
+          class="side-nav__profile-menu-item"
+          [class.side-nav__profile-menu-item--active]="theme.isDark()"
+          (click)="setTheme('dark')"
+        >
+          <!-- Moon icon -->
+          <svg viewBox="0 0 16 16" fill="none" class="side-nav__profile-menu-icon">
+            <path d="M13.5 8.5A5.5 5.5 0 017.5 3a5.5 5.5 0 100 10 5.5 5.5 0 006-4.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Dark Mode</span>
+          @if (theme.isDark()) {
+            <svg viewBox="0 0 12 12" fill="none" class="side-nav__profile-menu-check">
+              <path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          }
+        </button>
+        <button
+          class="side-nav__profile-menu-item"
+          [class.side-nav__profile-menu-item--active]="theme.isLight()"
+          (click)="setTheme('light')"
+        >
+          <!-- Sun icon -->
+          <svg viewBox="0 0 16 16" fill="none" class="side-nav__profile-menu-icon">
+            <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M8 1.5v1M8 13.5v1M1.5 8h1M13.5 8h1M3.4 3.4l.7.7M11.9 11.9l.7.7M3.4 12.6l.7-.7M11.9 4.1l.7-.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <span>Light Mode</span>
+          @if (theme.isLight()) {
+            <svg viewBox="0 0 12 12" fill="none" class="side-nav__profile-menu-check">
+              <path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          }
+        </button>
       </div>
-    </div>
-  } @else {
-    <div class="side-nav__profile side-nav__profile--collapsed">
-      <div class="side-nav__avatar" title="Aravind Thangaraj / Operations Analyst">AT</div>
-    </div>
-  }
+    }
+  </div>
 
   <!-- ═══ Scrollable Nav Body ════════════════════════════════════════ -->
   <div class="side-nav__body">

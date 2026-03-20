@@ -1,6 +1,7 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, HostListener, inject, input, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ThemeService } from '../theme.service';
 
 export interface NavLink {
   label: string;
@@ -17,6 +18,10 @@ export interface NavLink {
 export class SideNavComponent {
   collapsed = input(false);
   toggleCollapse = output<void>();
+
+  readonly theme = inject(ThemeService);
+
+  profileMenuOpen = signal(false);
 
   // Collapsible group state
   araMainOpen  = signal(true);
@@ -70,4 +75,19 @@ export class SideNavComponent {
   toggleAraMain(): void    { this.araMainOpen.update(v => !v); }
   toggleExceptions(): void { this.exceptionsOpen.update(v => !v); }
   onToggle(): void         { this.toggleCollapse.emit(); }
+
+  toggleProfileMenu(): void { this.profileMenuOpen.update(v => !v); }
+
+  setTheme(t: 'dark' | 'light'): void {
+    this.theme.setTheme(t);
+    this.profileMenuOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(e: MouseEvent): void {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.side-nav__profile-wrap')) {
+      this.profileMenuOpen.set(false);
+    }
+  }
 }

@@ -659,4 +659,112 @@
     height: 6px;
     opacity: 0.6;
   }
+
+  // ---- Profile wrapper (anchors the dropdown) ----
+  &__profile-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  // ---- Make profile a button ----
+  &__profile {
+    width: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-family);
+    transition: background var(--transition-fast);
+
+    &:hover { background: var(--bg-card-hover); }
+    &--open  { background: var(--bg-card-hover); }
+  }
+
+  // ---- Profile chevron ----
+  &__profile-chevron {
+    width: 12px;
+    height: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: transform var(--transition-normal);
+    margin-left: auto;
+
+    &--up { transform: rotate(180deg); }
+  }
+
+  // ---- Theme dropdown panel ----
+  &__profile-menu {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: var(--s-2);
+    right: var(--s-2);
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    z-index: 100;
+    animation: sn-menu-in 0.14s ease;
+
+    &--collapsed {
+      left: 4px;
+      right: 4px;
+    }
+  }
+
+  @keyframes sn-menu-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  &__profile-menu-header {
+    padding: 6px 12px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  &__profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    width: 100%;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    font-family: var(--font-family);
+    font-size: var(--font-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+    text-align: left;
+
+    &:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+    }
+
+    &--active {
+      color: var(--teal-400);
+      background: rgba(0,196,179,0.07);
+    }
+  }
+
+  &__profile-menu-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: inherit;
+  }
+
+  &__profile-menu-check {
+    width: 12px;
+    height: 12px;
+    color: var(--teal-500);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
 }

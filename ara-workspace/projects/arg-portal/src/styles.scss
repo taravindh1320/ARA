@@ -87,6 +87,65 @@
   --transition-slow:   300ms ease;
 }
 
+/* =========================================
+   LIGHT THEME OVERRIDES
+   Applied when <html data-theme="light">
+   ========================================= */
+:root[data-theme="light"] {
+  /* Backgrounds — clean enterprise off-white */
+  --bg-app:         #eef2f7;
+  --bg-surface:     #ffffff;
+  --bg-card:        #f8fafd;
+  --bg-card-hover:  #edf2f8;
+  --bg-input:       #ffffff;
+  --bg-overlay:     rgba(238, 242, 247, 0.92);
+
+  /* Borders */
+  --border-subtle:  #dde4ef;
+  --border-default: #c4cfe0;
+  --border-strong:  #8fa3bf;
+  --border-focus:   #00c4b3;
+
+  /* Keep teal palette identical — brand accent stays the same */
+
+  /* Text */
+  --text-primary:   #0e1a27;
+  --text-secondary: #374e6b;
+  --text-muted:     #6b84a0;
+  --text-inverse:   #ffffff;
+
+  /* Status — slightly more vivid on light bg */
+  --color-success:      #159a55;
+  --color-success-bg:   rgba(21, 154, 85, 0.09);
+  --color-warning:      #c47d00;
+  --color-warning-bg:   rgba(196, 125, 0, 0.09);
+  --color-danger:       #c92740;
+  --color-danger-bg:    rgba(201, 39, 64, 0.09);
+  --color-info:         #1878d4;
+  --color-info-bg:      rgba(24, 120, 212, 0.09);
+  --color-neutral:      #6b84a0;
+  --color-neutral-bg:   rgba(107, 132, 160, 0.09);
+
+  /* Shadows — lighter on white */
+  --shadow-sm: 0 1px 3px rgba(14, 26, 39, 0.08);
+  --shadow-md: 0 4px 12px rgba(14, 26, 39, 0.10);
+  --shadow-lg: 0 8px 28px rgba(14, 26, 39, 0.13);
+}
+
+/* AG Grid — light mode overrides */
+:root[data-theme="light"] .ag-theme-alpine-dark,
+:root[data-theme="light"] .ag-theme-balham-dark {
+  --ag-background-color:              #ffffff;
+  --ag-odd-row-background-color:      #f8fafd;
+  --ag-header-background-color:       #eef2f7;
+  --ag-border-color:                  #dde4ef;
+  --ag-row-hover-color:               #e8f0fb;
+  --ag-selected-row-background-color: rgba(0,196,179,0.08);
+  --ag-foreground-color:              #0e1a27;
+  --ag-secondary-foreground-color:    #374e6b;
+  --ag-header-foreground-color:       #374e6b;
+}
+
 /* --- Reset & Base --- */
 *,
 *::before,
@@ -359,6 +418,7 @@ select.form-control option { background: var(--bg-card); color: var(--text-prima
 .chip--emea   { background: rgba(251,191,36,0.08);  color: #fbbf24;  border-color: rgba(251,191,36,0.25); }
 .chip--apac   { background: rgba(52,211,153,0.08);  color: #34d399;  border-color: rgba(52,211,153,0.25); }
 .chip--latam  { background: rgba(167,139,250,0.08); color: #a78bfa;  border-color: rgba(167,139,250,0.25); }
+.chip--nam    { background: rgba(251,113,133,0.08); color: #fb7185;  border-color: rgba(251,113,133,0.25); }
 .chip--global { background: rgba(125,155,191,0.08); color: #7d9bbf;  border-color: rgba(125,155,191,0.25); }
 
 /* --- Tabs size variants --- */
