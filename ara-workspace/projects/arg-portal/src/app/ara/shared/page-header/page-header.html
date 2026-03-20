@@ -1,0 +1,36 @@
+<div class="page-header">
+  <!-- Breadcrumbs -->
+  @if (breadcrumbs().length) {
+    <nav class="page-header__breadcrumbs">
+      @for (crumb of breadcrumbs(); track crumb.label; let last = $last) {
+        @if (crumb.route && !last) {
+          <a class="page-header__crumb" [routerLink]="crumb.route">{{ crumb.label }}</a>
+          <span class="page-header__crumb-sep">›</span>
+        } @else {
+          <span class="page-header__crumb page-header__crumb--current">{{ crumb.label }}</span>
+        }
+      }
+    </nav>
+  }
+
+  <!-- Main header row -->
+  <div class="page-header__row">
+    <div class="page-header__left">
+      <h1 class="page-header__title">{{ title() }}</h1>
+      @if (subtitle()) {
+        <p class="page-header__subtitle">{{ subtitle() }}</p>
+      }
+    </div>
+    <div class="page-header__right">
+      @if (lastRefresh()) {
+        <span class="page-header__refresh">
+          <svg class="page-header__refresh-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M13.5 8A5.5 5.5 0 1 1 8 2.5c1.5 0 2.87.6 3.87 1.57L13.5 5.6V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{ lastRefresh() }}
+        </span>
+      }
+      <ng-content select="[slot=actions]" />
+    </div>
+  </div>
+</div>

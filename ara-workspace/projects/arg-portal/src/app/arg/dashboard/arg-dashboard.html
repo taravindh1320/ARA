@@ -1,0 +1,121 @@
+<div class="arg-dash">
+  <ara-page-header
+    title="ARG Dashboard"
+    subtitle="Account Reference Group — operational overview and workflow queue"
+    [breadcrumbs]="breadcrumbs"
+    lastRefresh="Today 10:45 AM"
+  >
+    <div slot="actions">
+      <a routerLink="/arg/workflow" class="btn btn--primary btn--sm">Open Workflow</a>
+    </div>
+  </ara-page-header>
+
+  <!-- ── KPI Strip ─────────────────────────────────────────────── -->
+  <div class="arg-dash__kpi-strip">
+    <ara-kpi-card label="Total Submissions"  value="130"  subValue="This month"  trend="up"   delta="+12" status="info"    />
+    <ara-kpi-card label="Pending Review"     value="19"   subValue="Action required" trend="flat" status="warning" />
+    <ara-kpi-card label="Approved Today"     value="8"    subValue="vs 11 yesterday" trend="down" delta="-3"  status="success" />
+    <ara-kpi-card label="SLA Breaches"       value="11"   subValue="Open items"   trend="up"   delta="+2"  status="danger"  />
+    <ara-kpi-card label="On Hold"            value="4"    subValue="Awaiting info" trend="flat" status="neutral" />
+  </div>
+
+  <!-- ── Main Content ─────────────────────────────────────────── -->
+  <div class="arg-dash__body">
+
+    <!-- Left: Workflow Queue ──────────────────────────────────── -->
+    <div class="arg-dash__main">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Workflow Queue</span>
+          <div class="tabs tabs--sm">
+            <button class="tabs__tab" [class.tabs__tab--active]="activeTab() === 'pending'" (click)="setTab('pending')">Pending</button>
+            <button class="tabs__tab" [class.tabs__tab--active]="activeTab() === 'approved'" (click)="setTab('approved')">Approved</button>
+            <button class="tabs__tab" [class.tabs__tab--active]="activeTab() === 'all'" (click)="setTab('all')">All</button>
+          </div>
+        </div>
+
+        <div class="arg-dash__queue">
+          @for (task of filteredTasks(); track task.id) {
+            <div class="queue-item" [class.queue-item--overdue]="task.overdue">
+              <div class="queue-item__top">
+                <span class="queue-item__ref">{{ task.ref }}</span>
+                <span class="badge badge--{{ priorityClass(task.priority) }} badge--xs">{{ task.priority }}</span>
+                <span class="badge badge--{{ statusClass(task.status) }} badge--xs">{{ task.status | titlecase }}</span>
+                @if (task.overdue) {
+                  <span class="queue-item__overdue-flag">OVERDUE</span>
+                }
+              </div>
+              <div class="queue-item__desc">{{ task.description }}</div>
+              <div class="queue-item__meta">
+                <span class="queue-item__meta-item">
+                  <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4v3.5l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Due {{ task.dueDate }}
+                </span>
+                <span class="queue-item__meta-item">
+                  <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M2 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  {{ task.submittedBy }}
+                </span>
+                <span class="queue-item__meta-region chip chip--{{ task.region.toLowerCase() }}">{{ task.region }}</span>
+              </div>
+            </div>
+          }
+          @if (filteredTasks().length === 0) {
+            <div class="arg-dash__empty">No items to display</div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Side panels ────────────────────────────────────── -->
+    <div class="arg-dash__side">
+
+      <!-- Recent Activity -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Activity</span>
+          <span class="section-label">Today</span>
+        </div>
+        <div class="activity-feed">
+          @for (item of recentActivity; track item.id) {
+            <div class="activity-item">
+              <div class="activity-item__dot activity-item__dot--{{ item.type }}"></div>
+              <div class="activity-item__content">
+                <span class="activity-item__action">{{ item.action }}</span>
+                <span class="activity-item__ref">{{ item.ref }}</span>
+                <span class="activity-item__meta">{{ item.user }} · {{ item.time }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Regional Breakdown -->
+      <div class="card" style="margin-top: var(--s-4)">
+        <div class="card-header">
+          <span class="card-title">Regional Summary</span>
+        </div>
+        <table class="arg-dash__region-table">
+          <thead>
+            <tr>
+              <th>Region</th>
+              <th>Pending</th>
+              <th>Approved</th>
+              <th>SLA</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of regionBreakdown; track r.region) {
+              <tr>
+                <td><span class="chip chip--{{ r.region.toLowerCase() }}">{{ r.region }}</span></td>
+                <td class="num">{{ r.pending }}</td>
+                <td class="num">{{ r.approved }}</td>
+                <td class="num" [class.breach]="r.slaBreaches > 0">{{ r.slaBreaches }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>

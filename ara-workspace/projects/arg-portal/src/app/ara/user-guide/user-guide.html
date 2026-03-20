@@ -1,0 +1,56 @@
+<div class="user-guide">
+  <ara-page-header
+    title="User Guide"
+    subtitle="Reference documentation for ARA / ARG portal operations"
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <!-- Intro banner -->
+  <div class="user-guide__intro">
+    <div class="user-guide__intro-icon">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 2a10 10 0 100 20A10 10 0 0012 2z" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M12 7v1M12 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="user-guide__intro-title">ARG Portal Documentation</div>
+      <div class="user-guide__intro-body">
+        This guide covers the key operational workflows in the ARA and ARG modules.
+        Use the sections below to navigate to specific topics. For support, contact the Operations team.
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide sections grid -->
+  <div class="user-guide__grid">
+    @for (section of sections; track section.id) {
+      <div class="guide-card">
+        <div class="guide-card__num">0{{ section.id }}</div>
+        <div class="guide-card__body">
+          <div class="guide-card__title">{{ section.title }}</div>
+          <div class="guide-card__desc">{{ section.description }}</div>
+        </div>
+        <a class="guide-card__link btn btn--ghost btn--sm" [href]="section.link">
+          View Guide
+          <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    }
+  </div>
+
+  <!-- Quick links -->
+  <div class="user-guide__quick">
+    <div class="section-label" style="margin-bottom: var(--s-4)">Quick Navigation</div>
+    <div class="user-guide__quick-links">
+      <a routerLink="/ara/dashboard"               class="btn btn--ghost btn--sm">ARA Dashboard</a>
+      <a routerLink="/ara/main/search"             class="btn btn--ghost btn--sm">ARA Search</a>
+      <a routerLink="/ara/main/abacus-lookup"      class="btn btn--ghost btn--sm">Abacus Lookup</a>
+      <a routerLink="/ara/exceptions/ara-to-abacus" class="btn btn--ghost btn--sm">Exception Queues</a>
+      <a routerLink="/arg/dashboard"               class="btn btn--ghost btn--sm">ARG Dashboard</a>
+      <a routerLink="/arg/workflow"                class="btn btn--ghost btn--sm">ARG Workflow</a>
+      <a routerLink="/ara/report-repository"       class="btn btn--ghost btn--sm">Reports</a>
+      <a routerLink="/ara/feeds"                   class="btn btn--ghost btn--sm">Feeds</a>
+    </div>
+  </div>
+</div>

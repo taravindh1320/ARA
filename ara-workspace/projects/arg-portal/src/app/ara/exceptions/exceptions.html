@@ -1,0 +1,204 @@
+<div class="exc-page" [class.exc-page--drawer-open]="drawerOpen()">
+
+  <!-- Page Header -->
+  <ara-page-header
+    [title]="queueType()"
+    subtitle="Exception management queue — review, assign and resolve breaks."
+    [breadcrumbs]="breadcrumbs()"
+  >
+    <div slot="actions">
+      <button class="btn btn--secondary btn--sm">
+        <svg viewBox="0 0 14 14" fill="none" style="width:13px;height:13px">
+          <path d="M7 1v9M4 7l3 3 3-3M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Export
+      </button>
+      <button class="btn btn--ghost btn--sm">&#8635; Refresh</button>
+    </div>
+  </ara-page-header>
+
+  <!-- KPI Strip -->
+  <section class="exc-page__kpi-strip">
+    <ara-kpi-card
+      label="Total Exceptions"
+      [value]="totalCount().toString()"
+      subValue="In this queue"
+      status="neutral"
+    />
+    <ara-kpi-card
+      label="Open"
+      [value]="openCount().toString()"
+      subValue="Requires action"
+      status="danger"
+      [trend]="openCount() > 5 ? 'up' : 'flat'"
+    />
+    <ara-kpi-card
+      label="Escalated"
+      [value]="escalatedCount().toString()"
+      subValue="Elevated priority"
+      status="warning"
+    />
+    <ara-kpi-card
+      label="Resolved"
+      [value]="resolvedCount().toString()"
+      subValue="Cleared today"
+      status="success"
+    />
+    <ara-kpi-card
+      label="Avg Aging"
+      [value]="avgAging() + 'd'"
+      subValue="Working days open"
+      status="info"
+    />
+  </section>
+
+  <!-- Filter bar -->
+  <ara-filter-bar
+    searchPlaceholder="Search ISIN, security, owner..."
+    [showRegion]="true"
+    [showStatus]="true"
+    (applyFilter)="onApplyFilter($event)"
+    (clearFilter)="onClearFilter()"
+  >
+    <button class="btn btn--primary btn--sm">
+      <svg viewBox="0 0 14 14" fill="none" style="width:12px;height:12px">
+        <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      Assign
+    </button>
+    <button class="btn btn--secondary btn--sm">Bulk Resolve</button>
+  </ara-filter-bar>
+
+  <!-- Main workspace: grid + optional drawer -->
+  <div class="exc-page__workspace">
+
+    <!-- Grid area -->
+    <div class="exc-page__grid-area">
+      <!-- Row count bar -->
+      <div class="exc-page__count-bar">
+        <span class="exc-page__count-text">
+          <strong>{{ filteredExceptions().length }}</strong> exceptions
+          @if (openCount() > 0) {
+            &nbsp;·&nbsp;
+            <span class="text-danger">{{ openCount() }} open</span>
+          }
+          @if (escalatedCount() > 0) {
+            &nbsp;·&nbsp;
+            <span class="text-warning">{{ escalatedCount() }} escalated</span>
+          }
+        </span>
+        <span class="text-xs text-muted">Click a row to view details</span>
+      </div>
+
+      <!-- AG Grid -->
+      <div class="exc-page__grid-wrap">
+        @if (filteredExceptions().length === 0) {
+          <div class="empty-state">
+            <div class="empty-state__icon">✓</div>
+            <div class="empty-state__title">No exceptions found</div>
+            <div class="empty-state__body">All records in this queue have been resolved, or no records match the active filters.</div>
+          </div>
+        } @else {
+          <ag-grid-angular
+            [theme]="theme"
+            [rowData]="filteredExceptions()"
+            [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef"
+            [rowSelection]="rowSelection"
+            [animateRows]="true"
+            (gridReady)="onGridReady($event)"
+            (rowClicked)="onRowClicked($event)"
+            style="width:100%;height:100%"
+          />
+        }
+      </div>
+    </div>
+
+    <!-- Right drawer panel -->
+    @if (drawerOpen() && selectedRow()) {
+      <aside class="exc-page__drawer">
+        <!-- Drawer header -->
+        <div class="exc-page__drawer-header">
+          <div>
+            <div class="exc-page__drawer-title">Exception #{{ selectedRow()!.id }}</div>
+            <div class="exc-page__drawer-subtitle">{{ selectedRow()!.securityName }}</div>
+          </div>
+          <button class="btn btn--ghost btn--icon" (click)="closeDrawer()">
+            <svg viewBox="0 0 14 14" fill="none">
+              <path d="M2 2L12 12M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="exc-page__drawer-body">
+
+          <!-- Status + Priority badges -->
+          <div class="exc-page__drawer-badges">
+            <span class="badge"
+              [class]="'badge--' + (selectedRow()!.status === 'OPEN' ? 'danger' : selectedRow()!.status === 'ESCALATED' ? 'warning' : selectedRow()!.status === 'RESOLVED' ? 'success' : 'info')">
+              {{ selectedRow()!.status }}
+            </span>
+            <span class="badge"
+              [class]="'badge--' + (selectedRow()!.priority === 'HIGH' ? 'danger' : selectedRow()!.priority === 'MEDIUM' ? 'warning' : 'neutral')">
+              {{ selectedRow()!.priority }} Priority
+            </span>
+            <span class="badge badge--neutral">{{ selectedRow()!.agingDays }}d old</span>
+          </div>
+
+          <!-- Detail rows -->
+          <div class="exc-page__drawer-section">
+            <div class="section-label">Exception Details</div>
+            @for (row of [
+              { label: 'ISIN',         value: selectedRow()!.isin },
+              { label: 'Security',     value: selectedRow()!.securityName },
+              { label: 'Region',       value: selectedRow()!.region },
+              { label: 'Break Amount', value: '$' + selectedRow()!.breakAmount.toLocaleString() },
+              { label: 'Aging',        value: selectedRow()!.agingDays + ' day(s)' },
+              { label: 'Owner',        value: selectedRow()!.owner },
+              { label: 'Source Ref',   value: selectedRow()!.sourceRef },
+              { label: 'Target Ref',   value: selectedRow()!.targetRef },
+            ]; track row.label) {
+              <div class="exc-page__drawer-field">
+                <span class="exc-page__drawer-field-label">{{ row.label }}</span>
+                <span class="exc-page__drawer-field-value">{{ row.value }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Last action -->
+          <div class="exc-page__drawer-section">
+            <div class="section-label">Activity</div>
+            <div class="exc-page__drawer-activity">
+              <div class="exc-page__drawer-activity-item">
+                <span class="exc-page__drawer-activity-dot"></span>
+                <div>
+                  <div class="exc-page__drawer-activity-action">{{ selectedRow()!.lastAction }}</div>
+                  <div class="text-xs text-muted">By {{ selectedRow()!.owner }} · Today</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments -->
+          <div class="exc-page__drawer-section">
+            <div class="section-label">Notes</div>
+            <p class="exc-page__drawer-comment">{{ selectedRow()!.comments }}</p>
+          </div>
+        </div>
+
+        <!-- Drawer actions -->
+        <div class="exc-page__drawer-actions">
+          @if (selectedRow()!.status !== 'RESOLVED') {
+            <button class="btn btn--primary btn--sm" (click)="onResolve(selectedRow()!)">Mark Resolved</button>
+            @if (selectedRow()!.status !== 'ESCALATED') {
+              <button class="btn btn--secondary btn--sm" (click)="onEscalate(selectedRow()!)">Escalate</button>
+            }
+          }
+          <button class="btn btn--ghost btn--sm">Add Note</button>
+        </div>
+      </aside>
+    }
+
+  </div>
+
+</div>

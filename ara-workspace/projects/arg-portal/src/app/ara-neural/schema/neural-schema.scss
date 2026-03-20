@@ -1,0 +1,617 @@
+// ── Node accent colors ────────────────────────────────────────────────
+$node-fullkey:  #00C4B3;
+$node-abacus:   #4A9EE0;
+$node-tlm:      #8B5CF6;
+$node-ao:       #F5A623;
+$node-approver: #22C55E;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+// ── Page shell ────────────────────────────────────────────────────────
+.ns-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+// ── Subtitle bar ──────────────────────────────────────────────────────
+.ns-subtitle-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: 7px var(--page-padding);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+
+  &__icon { width: 20px; height: 20px; flex-shrink: 0; }
+
+  &__text {
+    flex: 1;
+    font-size: var(--font-xs);
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  &__count {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+}
+
+// ── 2-column workspace: sidebar + canvas ─────────────────────────────
+.ns-workspace {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  flex: 1 1 auto;
+  overflow: hidden;
+  position: relative; // anchor for the absolute drawer
+}
+
+// ── Left sidebar ──────────────────────────────────────────────────────
+.ns-sidebar {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  overflow: hidden;
+
+  &__label {
+    padding: 5px 12px 3px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+}
+
+// Search bar
+.ns-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--s-2) var(--s-3);
+  flex-shrink: 0;
+
+  &__icon {
+    position: absolute;
+    left: 20px;
+    width: 13px; height: 13px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 6px 26px 6px 30px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: var(--font-xs);
+    font-family: var(--font-family);
+    outline: none;
+
+    &::placeholder { color: var(--text-muted); }
+    &:focus { border-color: var(--teal-500); }
+  }
+
+  &__clear {
+    position: absolute;
+    right: 18px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 10px;
+    line-height: 1;
+    padding: 2px 4px;
+    &:hover { color: var(--text-secondary); }
+  }
+}
+
+// Record list
+.ns-record-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 0 var(--s-2);
+}
+
+// Compact 2-row record item
+.ns-record-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all var(--transition-fast);
+  border-bottom: 1px solid var(--border-subtle);
+
+  &:hover { background: var(--bg-card-hover); }
+
+  &--active {
+    background: rgba(0,196,179,0.07);
+    border-left-color: var(--teal-500);
+  }
+
+  &__top {
+    margin-bottom: 3px;
+  }
+
+  &__key {
+    font-size: var(--font-xs);
+    font-weight: 700;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+
+  &__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-2);
+  }
+
+  &__meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.ns-empty {
+  padding: var(--s-5) var(--s-4);
+  text-align: center;
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+}
+
+// ── Center canvas ─────────────────────────────────────────────────────
+.ns-canvas {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--s-4) var(--s-4) var(--s-4);
+  background: var(--bg-app);
+
+  // Top bar (label + detail toggle)
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    margin-bottom: var(--s-3);
+    flex-shrink: 0;
+  }
+
+  &__bar-left {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    flex: 1;
+  }
+
+  &__label-text {
+    font-size: var(--font-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+  }
+
+  &__record-id {
+    font-size: var(--font-xs);
+    font-weight: 700;
+    color: var(--teal-400);
+  }
+
+  &__detail-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    flex-shrink: 0;
+
+    &--active {
+      background: rgba(0,196,179,0.12) !important;
+      border-color: rgba(0,196,179,0.4) !important;
+      color: var(--teal-400) !important;
+    }
+  }
+
+  &__empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+  }
+}
+
+// ── Neural graph: fills remaining canvas height ───────────────────────
+.ns-graph {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 320px;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(0,196,179,0.04) 0%,
+    rgba(0,196,179,0.01) 45%,
+    transparent 70%
+  );
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+// SVG connector overlay
+.ns-graph__svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+
+// Connection lines — calm dashes, subdued by default
+.ns-gline {
+  stroke-width: 1.2;
+  stroke-dasharray: 6 5;
+  opacity: 0.4;
+
+  &--abacus   { stroke: $node-abacus;   }
+  &--tlm      { stroke: $node-tlm;      }
+  &--ao       { stroke: $node-ao;       }
+  &--approver { stroke: $node-approver; }
+}
+
+// ── Graph nodes ───────────────────────────────────────────────────────
+.ns-gnode {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+  min-width: 110px;
+  max-width: 150px;
+  user-select: none;
+  z-index: 1;
+
+  &:hover {
+    transform: translate(-50%, -50%) scale(1.05);
+    z-index: 3;
+  }
+
+  // Positions
+  &--center     { top: 50%; left: 50%; min-width: 152px; padding: 14px 18px; border-radius: 16px; z-index: 2; }
+  &--pos-top    { top: 13%; left: 50%; }
+  &--pos-right  { top: 50%; left: 83%; }
+  &--pos-bottom { top: 86%; left: 50%; }
+  &--pos-left   { top: 50%; left: 17%; }
+
+  &__icon {
+    width: 20px; height: 20px;
+    margin-bottom: 2px;
+    flex-shrink: 0;
+  }
+
+  &__type {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    opacity: 0.65;
+    line-height: 1.2;
+  }
+
+  &__value {
+    font-size: var(--font-xs);
+    font-weight: 700;
+    color: var(--text-primary);
+    word-break: break-word;
+    line-height: 1.3;
+    max-width: 140px;
+  }
+
+  &__sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.2;
+  }
+
+  // Animated breathing ring — center node only
+  &__pulse {
+    position: absolute;
+    inset: -5px;
+    border-radius: 20px;
+    border: 1px solid rgba($node-fullkey, 0.2);
+    animation: ns-pulse 2.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  // ── Color variants ───────────────────────────────────────────────
+  // Center node: prominent glow
+  &--fullkey {
+    border-color: rgba($node-fullkey, 0.45);
+    box-shadow: 0 0 18px 4px rgba($node-fullkey, 0.18);
+    .ns-gnode__type  { color: $node-fullkey; }
+    .ns-gnode__icon  { color: $node-fullkey; }
+    &:hover {
+      border-color: $node-fullkey;
+      box-shadow: 0 0 26px 7px rgba($node-fullkey, 0.28);
+    }
+  }
+
+  // Outer nodes: calmer glow by default, stronger on hover
+  &--abacus {
+    border-color: rgba($node-abacus, 0.28);
+    box-shadow: 0 0 8px 2px rgba($node-abacus, 0.07);
+    .ns-gnode__type { color: $node-abacus; }
+    &:hover {
+      border-color: rgba($node-abacus, 0.7);
+      box-shadow: 0 0 18px 4px rgba($node-abacus, 0.22);
+    }
+  }
+
+  &--tlm {
+    border-color: rgba($node-tlm, 0.28);
+    box-shadow: 0 0 8px 2px rgba($node-tlm, 0.07);
+    .ns-gnode__type { color: $node-tlm; }
+    &:hover {
+      border-color: rgba($node-tlm, 0.7);
+      box-shadow: 0 0 18px 4px rgba($node-tlm, 0.22);
+    }
+  }
+
+  &--ao {
+    border-color: rgba($node-ao, 0.28);
+    box-shadow: 0 0 8px 2px rgba($node-ao, 0.06);
+    .ns-gnode__type { color: $node-ao; }
+    &:hover {
+      border-color: rgba($node-ao, 0.7);
+      box-shadow: 0 0 18px 4px rgba($node-ao, 0.2);
+    }
+  }
+
+  &--approver {
+    border-color: rgba($node-approver, 0.28);
+    box-shadow: 0 0 8px 2px rgba($node-approver, 0.07);
+    .ns-gnode__type { color: $node-approver; }
+    &:hover {
+      border-color: rgba($node-approver, 0.7);
+      box-shadow: 0 0 18px 4px rgba($node-approver, 0.22);
+    }
+  }
+}
+
+@keyframes ns-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%       { opacity: 0;   transform: scale(1.12); }
+}
+
+// ── Node entrance animation ───────────────────────────────────────────
+//
+// Nodes carry their existing position transform (translate -50%,-50%).
+// The hidden modifier injects a compound transform that offsets Y by 10px
+// and scales down — cleared on reveal so the transition plays cleanly.
+//
+// Each node position class resets to a distinct origin direction so the
+// entrance feels intentional (top node rises in, side nodes slide from sides).
+
+.ns-gnode {
+  // transition added here (base rule already declared above — this extends it)
+  transition: opacity 0.22s ease, box-shadow 0.2s, border-color 0.2s, transform 0.22s ease;
+  will-change: opacity, transform;
+
+  &--hidden {
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+
+  // Direction-aware entrance offsets
+  &--center#{&}--hidden   { transform: translate(-50%, -50%) scale(0.82); }
+  &--pos-top#{&}--hidden  { transform: translate(-50%, calc(-50% + 14px)) scale(0.88); }
+  &--pos-bottom#{&}--hidden { transform: translate(-50%, calc(-50% - 14px)) scale(0.88); }
+  &--pos-right#{&}--hidden  { transform: translate(calc(-50% - 14px), -50%) scale(0.88); }
+  &--pos-left#{&}--hidden   { transform: translate(calc(-50% + 14px), -50%) scale(0.88); }
+}
+
+// ── Connector line entrance animation ────────────────────────────────
+
+.ns-gline {
+  transition: opacity 0.28s ease;
+  will-change: opacity;
+
+  &--hidden {
+    opacity: 0 !important;
+  }
+}
+
+// ── Graph canvas tracing state ────────────────────────────────────────
+
+.ns-graph--tracing {
+  // Faint horizontal scan beam sweeps down during reveal
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 196, 179, 0.04) 48%,
+      rgba(0, 196, 179, 0.07) 50%,
+      rgba(0, 196, 179, 0.04) 52%,
+      transparent 100%
+    );
+    background-size: 100% 200%;
+    animation: ns-scan 0.85s linear forwards;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+@keyframes ns-scan {
+  from { background-position: 0 -100%; }
+  to   { background-position: 0  100%; }
+}
+
+// ── Tracing indicator in canvas bar ──────────────────────────────────
+
+.ns-canvas__tracing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--teal-400);
+  font-style: italic;
+  opacity: 0.8;
+  animation: ns-fade-in 0.15s ease;
+}
+
+.ns-canvas__tracing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--teal-400);
+  animation: ns-blink 0.7s ease-in-out infinite alternate;
+  flex-shrink: 0;
+}
+
+@keyframes ns-blink {
+  from { opacity: 0.3; }
+  to   { opacity: 1;   }
+}
+
+@keyframes ns-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 0.8; }
+}
+
+// ── Drawer slide-in ───────────────────────────────────────────────────
+// ── Detail Drawer — slides in over the canvas ─────────────────────────
+.ns-drawer {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 288px;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 10;
+  animation: ns-slide-in 0.18s ease;
+  box-shadow: -6px 0 24px rgba(0,0,0,0.25);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding: 12px 14px 11px;
+    border-bottom: 1px solid var(--border-subtle);
+    flex-shrink: 0;
+  }
+
+  &__title {
+    flex: 1;
+    font-size: var(--font-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+  }
+
+  &__close {
+    font-size: 12px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  &__fields {
+    overflow-y: auto;
+    flex: 1 1 auto;
+  }
+
+  &__field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    gap: var(--s-3);
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__field-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 90px;
+  }
+
+  &__field-value {
+    font-size: var(--font-xs);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  &__section-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 14px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-subtle);
+    flex-shrink: 0;
+  }
+
+  &__comment {
+    padding: 4px 14px 10px;
+    font-size: var(--font-xs);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--s-2);
+    padding: 10px 14px var(--s-4);
+    margin-top: auto;
+    flex-shrink: 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+}
+
+@keyframes ns-slide-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}

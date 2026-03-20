@@ -1,0 +1,120 @@
+:host { display: block; height: 100%; overflow-y: auto; }
+
+.user-guide {
+  padding: var(--s-6) var(--s-6) var(--s-8);
+  max-width: 1200px;
+
+  &__intro {
+    display: flex;
+    gap: var(--s-5);
+    align-items: flex-start;
+    background: linear-gradient(135deg, rgba(0, 196, 179, 0.06), rgba(0, 196, 179, 0.02));
+    border: 1px solid rgba(0, 196, 179, 0.15);
+    border-radius: var(--r-lg);
+    padding: var(--s-5) var(--s-6);
+    margin-bottom: var(--s-7);
+  }
+
+  &__intro-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(0, 196, 179, 0.1);
+    border-radius: var(--r-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--teal-400);
+
+    svg { width: 24px; height: 24px; }
+  }
+
+  &__intro-title {
+    font-size: var(--font-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--s-1);
+  }
+
+  &__intro-body {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-4);
+    margin-bottom: var(--s-7);
+  }
+
+  &__quick {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-lg);
+    padding: var(--s-5) var(--s-6);
+  }
+
+  &__quick-links {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+  }
+}
+
+.guide-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  padding: var(--s-5);
+  display: flex;
+  gap: var(--s-4);
+  align-items: flex-start;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+
+  &:hover {
+    border-color: var(--teal-600);
+    background: var(--bg-card-hover);
+  }
+
+  &__num {
+    font-size: var(--font-xs);
+    font-weight: 700;
+    color: var(--teal-500);
+    opacity: 0.6;
+    flex-shrink: 0;
+    font-family: 'Roboto Mono', monospace;
+    padding-top: 2px;
+    width: 20px;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: var(--font-md);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--s-2);
+  }
+
+  &__desc {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: var(--s-4);
+  }
+
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    text-decoration: none;
+    flex-shrink: 0;
+
+    svg { width: 11px; height: 11px; }
+  }
+}

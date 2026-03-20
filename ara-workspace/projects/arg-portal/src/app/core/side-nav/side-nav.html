@@ -1,0 +1,234 @@
+<nav class="side-nav" [class.side-nav--collapsed]="collapsed()">
+
+  <!-- ═══ Brand Header ═══════════════════════════════════════════════ -->
+  <div class="side-nav__brand">
+    <div class="side-nav__logo">
+      <span class="side-nav__logo-badge">ARG</span>
+    </div>
+    @if (!collapsed()) {
+      <div class="side-nav__brand-text">
+        <span class="side-nav__brand-name">Account Reference</span>
+        <span class="side-nav__brand-sub">Architecture</span>
+      </div>
+    }
+    <button class="side-nav__toggle" (click)="onToggle()" [title]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="side-nav__toggle-icon" [class.side-nav__toggle-icon--reversed]="collapsed()">
+        <path d="M13 4L7 10L13 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ═══ User Profile ════════════════════════════════════════════════ -->
+  @if (!collapsed()) {
+    <div class="side-nav__profile">
+      <div class="side-nav__avatar">AT</div>
+      <div class="side-nav__profile-info">
+        <span class="side-nav__profile-name">Aravind Thangaraj</span>
+        <span class="side-nav__profile-role">Operations Analyst</span>
+      </div>
+    </div>
+  } @else {
+    <div class="side-nav__profile side-nav__profile--collapsed">
+      <div class="side-nav__avatar" title="Aravind Thangaraj / Operations Analyst">AT</div>
+    </div>
+  }
+
+  <!-- ═══ Scrollable Nav Body ════════════════════════════════════════ -->
+  <div class="side-nav__body">
+
+    <!-- ── ARA Neural ───────────────────────────────────────────── -->
+    <div class="side-nav__group side-nav__group--neural">
+      @if (!collapsed()) {
+        <div class="side-nav__group-label">ARA Neural</div>
+      }
+      @for (item of neuralItems; track item.route) {
+        <a class="side-nav__item"
+           [routerLink]="item.route"
+           routerLinkActive="side-nav__item--active"
+           [title]="collapsed() ? item.label : ''">
+          <span class="side-nav__item-icon">
+            <!-- Lineage / network icon -->
+            <svg viewBox="0 0 20 20" fill="none">
+              <circle cx="4"  cy="10" r="2.2" fill="currentColor" opacity=".9"/>
+              <circle cx="10" cy="4"  r="2.2" fill="currentColor" opacity=".9"/>
+              <circle cx="16" cy="10" r="2.2" fill="currentColor" opacity=".9"/>
+              <circle cx="10" cy="16" r="2.2" fill="currentColor" opacity=".5"/>
+              <line x1="4"  y1="10" x2="10" y2="4"  stroke="currentColor" stroke-width="1.3" opacity=".6"/>
+              <line x1="10" y1="4"  x2="16" y2="10" stroke="currentColor" stroke-width="1.3" opacity=".6"/>
+              <line x1="16" y1="10" x2="10" y2="16" stroke="currentColor" stroke-width="1.3" opacity=".4"/>
+              <line x1="4"  y1="10" x2="10" y2="16" stroke="currentColor" stroke-width="1.3" opacity=".3"/>
+            </svg>
+          </span>
+          @if (!collapsed()) {
+            <span class="side-nav__item-label">{{ item.label }}</span>
+          }
+        </a>
+      }
+    </div>
+
+    <!-- ── ARG ──────────────────────────────────────────────────── -->
+    <div class="side-nav__group">
+      @if (!collapsed()) {
+        <div class="side-nav__group-label">ARG</div>
+      }
+      @for (item of argItems; track item.route) {
+        <a class="side-nav__item"
+           [routerLink]="item.route"
+           routerLinkActive="side-nav__item--active"
+           [title]="collapsed() ? item.label : ''">
+          <span class="side-nav__item-icon">
+            @if (item.route === '/arg/dashboard') {
+              <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity=".6"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity=".6"/></svg>
+            } @else {
+              <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="1.8" rx=".9" fill="currentColor" opacity=".5"/><rect x="3" y="8" width="11" height="1.8" rx=".9" fill="currentColor"/><rect x="3" y="12" width="13" height="1.8" rx=".9" fill="currentColor" opacity=".7"/><path d="M14 14l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            }
+          </span>
+          @if (!collapsed()) {
+            <span class="side-nav__item-label">{{ item.label }}</span>
+          }
+        </a>
+      }
+    </div>
+
+    <!-- ── ARA ──────────────────────────────────────────────────── -->
+    <div class="side-nav__group">
+      @if (!collapsed()) {
+        <div class="side-nav__group-label">ARA</div>
+      }
+
+      <!-- ARA Dashboard -->
+      <a class="side-nav__item"
+         routerLink="/ara/dashboard"
+         routerLinkActive="side-nav__item--active"
+         [title]="collapsed() ? 'Dashboard' : ''">
+        <span class="side-nav__item-icon">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity=".6"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity=".6"/></svg>
+        </span>
+        @if (!collapsed()) {
+          <span class="side-nav__item-label">Dashboard</span>
+        }
+      </a>
+
+      <!-- ARA > Main -->
+      @if (!collapsed()) {
+        <button class="side-nav__group-toggle" (click)="toggleAraMain()">
+          <span class="side-nav__item-icon">
+            <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.8"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+          <span class="side-nav__item-label">Main</span>
+          <svg class="side-nav__chevron" [class.side-nav__chevron--open]="araMainOpen()" viewBox="0 0 12 12" fill="none">
+            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        @if (araMainOpen()) {
+          <div class="side-nav__sub-items">
+            @for (item of araMainItems; track item.route) {
+              <a class="side-nav__sub-item"
+                 [routerLink]="item.route"
+                 routerLinkActive="side-nav__sub-item--active"
+                 [title]="item.label">
+                <span class="side-nav__sub-dot"></span>
+                <span class="side-nav__item-label">{{ item.label }}</span>
+              </a>
+            }
+          </div>
+        }
+      }
+      @if (collapsed()) {
+        @for (item of araMainItems; track item.route) {
+          <a class="side-nav__item" [routerLink]="item.route" routerLinkActive="side-nav__item--active" [title]="item.label">
+            <span class="side-nav__sub-dot side-nav__sub-dot--icon"></span>
+          </a>
+        }
+      }
+
+      <!-- ARA > Exceptions -->
+      @if (!collapsed()) {
+        <button class="side-nav__group-toggle" (click)="toggleExceptions()">
+          <span class="side-nav__item-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 2L12.5 7.5H18L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L2 7.5H7.5L10 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="side-nav__item-label">Exceptions</span>
+          <svg class="side-nav__chevron" [class.side-nav__chevron--open]="exceptionsOpen()" viewBox="0 0 12 12" fill="none">
+            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        @if (exceptionsOpen()) {
+          <div class="side-nav__sub-items">
+            @for (ex of exceptionItems; track ex.route) {
+              <a class="side-nav__sub-item"
+                 [routerLink]="ex.route"
+                 routerLinkActive="side-nav__sub-item--active"
+                 [title]="ex.label">
+                <span class="side-nav__sub-dot"></span>
+                <span class="side-nav__item-label">{{ ex.label }}</span>
+              </a>
+            }
+          </div>
+        }
+      }
+      @if (collapsed()) {
+        @for (ex of exceptionItems; track ex.route) {
+          <a class="side-nav__item" [routerLink]="ex.route" routerLinkActive="side-nav__item--active" [title]="ex.label">
+            <span class="side-nav__sub-dot side-nav__sub-dot--icon"></span>
+          </a>
+        }
+      }
+
+      <!-- ARA: Report Repository + Feeds -->
+      @for (item of araOtherItems; track item.route) {
+        <a class="side-nav__item"
+           [routerLink]="item.route"
+           routerLinkActive="side-nav__item--active"
+           [title]="collapsed() ? item.label : ''">
+          <span class="side-nav__item-icon">
+            @if (item.route === '/ara/report-repository') {
+              <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><rect x="6" y="6" width="8" height="1.5" rx=".75" fill="currentColor" opacity=".6"/><rect x="6" y="9.5" width="6" height="1.5" rx=".75" fill="currentColor" opacity=".8"/><rect x="6" y="13" width="4" height="1.5" rx=".75" fill="currentColor" opacity=".5"/></svg>
+            } @else {
+              <svg viewBox="0 0 20 20" fill="none"><path d="M3 10h14M3 6h8M3 14h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="16" cy="6" r="2.5" fill="currentColor"/></svg>
+            }
+          </span>
+          @if (!collapsed()) {
+            <span class="side-nav__item-label">{{ item.label }}</span>
+          }
+        </a>
+      }
+    </div>
+
+    <!-- ── Settings ─────────────────────────────────────────────── -->
+    <div class="side-nav__group side-nav__group--settings">
+      @if (!collapsed()) {
+        <div class="side-nav__group-label">Settings</div>
+      }
+      @for (item of settingsItems; track item.route) {
+        <a class="side-nav__item"
+           [routerLink]="item.route"
+           routerLinkActive="side-nav__item--active"
+           [title]="collapsed() ? item.label : ''">
+          <span class="side-nav__item-icon">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v1.5M10 16.5V18M2 10h1.5M16.5 10H18M4.22 4.22l1.06 1.06M14.72 14.72l1.06 1.06M4.22 15.78l1.06-1.06M14.72 5.28l1.06-1.06" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </span>
+          @if (!collapsed()) {
+            <span class="side-nav__item-label">{{ item.label }}</span>
+          }
+        </a>
+      }
+      <button class="side-nav__item side-nav__item--logout" [title]="collapsed() ? 'Logout' : ''">
+        <span class="side-nav__item-icon">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M13 7l3 3-3 3M16 10H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 3H5a1 1 0 00-1 1v12a1 1 0 001 1h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </span>
+        @if (!collapsed()) {
+          <span class="side-nav__item-label">Logout</span>
+        }
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ═══ Footer ══════════════════════════════════════════════════════ -->
+  <div class="side-nav__footer">
+    @if (!collapsed()) {
+      <span class="side-nav__footer-text">ARG Portal v1.0.0</span>
+    }
+  </div>
+</nav>

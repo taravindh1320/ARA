@@ -1,0 +1,178 @@
+﻿<div class="db">
+
+  <!--  Page Header  -->
+  <ara-page-header
+    title="ARA Dashboard"
+    [breadcrumbs]="breadcrumbs"
+    [lastRefresh]="lastRefresh"
+  >
+    <div slot="actions">
+      <button class="btn btn--secondary btn--sm">
+        <svg viewBox="0 0 14 14" fill="none" style="width:12px;height:12px">
+          <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        Export
+      </button>
+      <button class="btn btn--ghost btn--sm">&#8635; Refresh</button>
+    </div>
+  </ara-page-header>
+
+  <!--  Control Row: Tabs + Region Selector  -->
+  <div class="db__control-row">
+    <div class="db__tabs" role="tablist">
+      <button
+        role="tab" class="db__tab"
+        [class.db__tab--active]="activeTab() === 'fullkeys'"
+        (click)="setTab('fullkeys')"
+      >Fullkeys</button>
+      <button
+        role="tab" class="db__tab"
+        [class.db__tab--active]="activeTab() === 'bankaccounts'"
+        (click)="setTab('bankaccounts')"
+      >Bank Accounts</button>
+    </div>
+
+    <div class="db__regions" role="group" aria-label="Region filter">
+      <span class="db__region-label">Region:</span>
+      @for (r of regions; track r) {
+        <button
+          class="db__region-btn"
+          [class.db__region-btn--active]="selectedRegion() === r"
+          (click)="setRegion(r)"
+        >{{ r }}</button>
+      }
+    </div>
+  </div>
+
+  <!--  Dashboard Body: Chart + Category Panels  -->
+  <div class="db__body">
+
+    <!-- Left: Distribution chart card -->
+    <div class="db__chart-card card">
+      <div class="card__header">
+        <span class="card__title">
+          @if (activeTab() === 'fullkeys') { No of Fullkeys } @else { Bank Accounts }
+           {{ selectedRegion() }}
+        </span>
+        <span class="db__chart-badge">
+          @if (activeTab() === 'fullkeys') { {{ fmt(activeMetrics().fullkeys) }} total }
+          @else { {{ fmt(activeMetrics().bankAccounts) }} total }
+        </span>
+      </div>
+
+      <div class="db__donut-wrap">
+        <div class="db__donut-outer">
+          <div class="db__donut" [style.background]="donutGradient()"></div>
+          <div class="db__donut-center">
+            <span class="db__donut-value">{{ donutCenter().value }}</span>
+            <span class="db__donut-sub">{{ donutCenter().label }}</span>
+          </div>
+        </div>
+
+        <div class="db__donut-legend">
+          @for (item of donutLegend(); track item.label) {
+            <div class="db__legend-row">
+              <span class="db__legend-dot" [style.background]="item.color"></span>
+              <span class="db__legend-name">{{ item.label }}</span>
+              <span class="db__legend-count">{{ fmt(item.count) }}</span>
+              <span class="db__legend-pct">
+                @if (activeTab() === 'fullkeys') {
+                  ({{ pct(item.count, activeMetrics().fullkeys) }}%)
+                } @else {
+                  ({{ pct(item.count, activeMetrics().bankAccounts) }}%)
+                }
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: 3 stacked category panels -->
+    <div class="db__panels">
+      @for (panel of categoryPanels(); track panel.title) {
+        <div class="db__panel">
+          <div class="db__panel-header">{{ panel.title }}</div>
+          <div class="db__panel-body">
+            @for (row of panel.rows; track row.label) {
+              <div class="db__panel-row">
+                <div class="db__panel-row-top">
+                  <span class="db__panel-row-label">{{ row.label }}</span>
+                  <span class="db__panel-row-count">{{ fmt(row.count) }}</span>
+                  <span class="db__panel-row-pct">{{ pct(row.count, row.total) }}%</span>
+                </div>
+                <div class="db__panel-bar-track">
+                  <div
+                    class="db__panel-bar-fill"
+                    [style.width]="barWidth(row.count, row.total)"
+                    [style.background]="'var(' + row.colorVar + ')'"
+                  ></div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!--  Metrics Matrix  -->
+  <div class="db__matrix-section">
+    <div class="db__matrix-header">
+      <span class="db__matrix-title">{{ activeTableView().title }}</span>
+      <span class="db__matrix-sub">
+        @if (activeTab() === 'fullkeys') { Fullkeys view } @else { Bank Accounts view }
+        · {{ activeTableView().columns.length }} {{ selectedRegion() === 'GLOBAL' ? 'regions' : 'countries' }}
+      </span>
+    </div>
+
+    <div class="db__matrix-wrap">
+      <table class="db__matrix">
+        <thead>
+          <tr>
+            <th class="db__matrix-th db__matrix-th--row">Metric</th>
+            @for (col of activeTableView().columns; track col; let last = $last) {
+              <th class="db__matrix-th"
+                [class.db__matrix-th--global]="selectedRegion() === 'GLOBAL' && last"
+              >{{ col }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of activeTableView().rows; track row.label; let i = $index) {
+            <tr class="db__matrix-row" [class.db__matrix-row--alt]="i % 2 === 1">
+              <td class="db__matrix-td db__matrix-td--label">{{ row.label }}</td>
+              @for (col of activeTableView().columns; track col; let last = $last) {
+                <td class="db__matrix-td db__matrix-td--num"
+                  [class.db__matrix-td--global]="selectedRegion() === 'GLOBAL' && last"
+                  [class.db__matrix-td--selected]="selectedRegion() === 'GLOBAL' && col === 'GLOBAL'"
+                >{{ fmt(row.values[col]) }}</td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="db__geo-strip">
+      <span class="db__geo-label">Geographic Distribution</span>
+      <div class="db__geo-bars">
+        @for (r of ['EMEA', 'APAC', 'LATAM', 'NAM']; track r) {
+          <div class="db__geo-item">
+            <span class="db__geo-region">{{ r }}</span>
+            <div class="db__geo-bar-track">
+              <div class="db__geo-bar" [class]="'db__geo-bar--' + r.toLowerCase()"
+                [style.width.%]="r === 'EMEA' ? 28 : r === 'APAC' ? 23 : r === 'NAM' ? 39 : 10"
+              ></div>
+            </div>
+            <span class="db__geo-pct">
+              {{ r === 'EMEA' ? '28.0' : r === 'APAC' ? '23.1' : r === 'NAM' ? '39.1' : '9.8' }}%
+            </span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+</div>

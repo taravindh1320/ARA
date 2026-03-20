@@ -1,0 +1,115 @@
+<div class="lookup-page">
+
+  <!-- Page Header -->
+  <ara-page-header
+    title="ARA Lookup"
+    subtitle="Search for an ARA record and inspect the full detail view."
+    [breadcrumbs]="breadcrumbs"
+  />
+
+  <!-- Split workspace -->
+  <div class="lookup-page__workspace">
+
+    <!-- LEFT: Search panel -->
+    <aside class="lookup-page__list-panel">
+      <div class="lookup-page__list-header">
+        <span class="lookup-page__list-title">Records</span>
+        <span class="badge badge--neutral">{{ filteredList().length }}</span>
+      </div>
+
+      <!-- Inline search -->
+      <div class="lookup-page__search-wrap">
+        <svg class="lookup-page__search-icon" viewBox="0 0 16 16" fill="none">
+          <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input
+          class="lookup-page__search-input"
+          type="text"
+          placeholder="Search ISIN or security name..."
+          [value]="searchTerm()"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </div>
+
+      <!-- List grid -->
+      <div class="lookup-page__grid-wrap">
+        <ag-grid-angular
+          [theme]="theme"
+          [rowData]="filteredList()"
+          [columnDefs]="listColumnDefs"
+          [defaultColDef]="defaultColDef"
+          [rowSelection]="{ mode: 'singleRow' }"
+          [suppressCellFocus]="false"
+          (gridReady)="onGridReady($event)"
+          (rowClicked)="onRowClicked($event)"
+          style="width:100%;height:100%"
+        />
+      </div>
+    </aside>
+
+    <!-- RIGHT: Detail panel -->
+    <section class="lookup-page__detail-panel">
+      @if (!selectedRecord()) {
+        <!-- Empty state -->
+        <div class="lookup-page__detail-empty">
+          <div class="empty-state">
+            <div class="empty-state__icon">📋</div>
+            <div class="empty-state__title">Select a record</div>
+            <div class="empty-state__body">
+              Click on any record in the list to view its full detail here.
+            </div>
+          </div>
+        </div>
+      } @else {
+        <!-- Detail content -->
+        <div class="lookup-page__detail-scroll">
+
+          <!-- Detail header -->
+          <div class="lookup-page__detail-header">
+            <div class="lookup-page__detail-title-row">
+              <div>
+                <h2 class="lookup-page__detail-name">{{ selectedRecord()!.securityName }}</h2>
+                <p class="lookup-page__detail-isin">{{ selectedRecord()!.isin }}</p>
+              </div>
+              <div class="lookup-page__detail-badges">
+                <span class="badge badge--neutral">{{ selectedRecord()!.region }}</span>
+                <span class="badge" [class]="'badge--' + (selectedRecord()!.status === 'MATCHED' ? 'success' : selectedRecord()!.status === 'EXCEPTION' ? 'warning' : 'info')">
+                  {{ selectedRecord()!.status }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detail sections -->
+          @for (section of getDetailSections(selectedRecord()!); track section.label) {
+            <div class="lookup-page__detail-section">
+              <div class="section-label">{{ section.label }}</div>
+              <div class="lookup-page__detail-grid">
+                @for (row of section.rows; track row.field) {
+                  <div class="lookup-page__detail-field">
+                    <span class="lookup-page__detail-field-label">{{ row.field }}</span>
+                    @if (row.badge) {
+                      <span class="badge" [class]="'badge--' + (row.badgeStatus || 'neutral')">{{ row.badge }}</span>
+                    } @else {
+                      <span class="lookup-page__detail-field-value">{{ row.value }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Action buttons -->
+          <div class="lookup-page__detail-actions">
+            <button class="btn btn--secondary btn--sm">View in ARA Grid</button>
+            <button class="btn btn--ghost btn--sm">Open Abacus</button>
+            <button class="btn btn--ghost btn--sm">Export Record</button>
+          </div>
+
+        </div>
+      }
+    </section>
+
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<div class="filter-bar">
+  <!-- Primary toolbar row -->
+  <div class="filter-bar__row">
+    <!-- Search input -->
+    <div class="filter-bar__search">
+      <svg class="filter-bar__search-icon" viewBox="0 0 16 16" fill="none">
+        <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input
+        class="filter-bar__search-input"
+        type="text"
+        [placeholder]="searchPlaceholder()"
+        [value]="searchValue()"
+        (input)="onSearch($any($event.target).value)"
+      />
+      @if (searchValue()) {
+        <button class="filter-bar__search-clear" (click)="onSearch('')">
+          <svg viewBox="0 0 12 12" fill="none">
+            <path d="M2 2L10 10M10 2L2 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      }
+    </div>
+
+    <!-- Region filter -->
+    @if (showRegion()) {
+      <select
+        class="form-control filter-bar__select"
+        [ngModel]="regionValue()"
+        (ngModelChange)="regionValue.set($event)"
+      >
+        @for (opt of regionOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    }
+
+    <!-- Status filter -->
+    @if (showStatus()) {
+      <select
+        class="form-control filter-bar__select"
+        [ngModel]="statusValue()"
+        (ngModelChange)="statusValue.set($event)"
+      >
+        @for (opt of statusOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    }
+
+    <!-- Action buttons -->
+    <div class="filter-bar__actions">
+      <button class="btn btn--primary btn--sm" (click)="onApply()">
+        <svg viewBox="0 0 14 14" fill="none">
+          <path d="M1.5 4h11M4 8h6M6 12h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Apply
+      </button>
+
+      @if (searchValue() || regionValue() || statusValue()) {
+        <button class="btn btn--ghost btn--sm" (click)="onClear()">Clear</button>
+      }
+
+      @if (showAdvanced()) {
+        <button class="btn btn--ghost btn--sm" (click)="toggleAdvanced()">
+          {{ advancedOpen() ? 'Less' : 'Advanced' }}
+          <svg viewBox="0 0 12 8" fill="none" [class.filter-bar__chevron--open]="advancedOpen()">
+            <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      }
+    </div>
+
+    <!-- Right slot for extra actions -->
+    <div class="filter-bar__extra">
+      <ng-content />
+    </div>
+  </div>
+
+  <!-- Advanced filter row -->
+  @if (showAdvanced() && advancedOpen()) {
+    <div class="filter-bar__advanced">
+      <ng-content select="[slot=advanced]" />
+    </div>
+  }
+</div>

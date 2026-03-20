@@ -1,0 +1,22 @@
+<div class="kpi-card" [class]="'kpi-card--' + status()">
+  <div class="kpi-card__accent"></div>
+  <div class="kpi-card__body">
+    <div class="kpi-card__label">{{ label() }}</div>
+    <div class="kpi-card__value-row">
+      <span class="kpi-card__value">{{ value() }}</span>
+      @if (delta()) {
+        <span class="kpi-card__delta" [class]="'kpi-card__delta--' + trend()">
+          @if (trend() === 'up')   { ↑ }
+          @if (trend() === 'down') { ↓ }
+          {{ delta() }}
+        </span>
+      }
+    </div>
+    @if (subValue()) {
+      <div class="kpi-card__sub-value">{{ subValue() }}</div>
+    }
+    @if (description()) {
+      <div class="kpi-card__description">{{ description() }}</div>
+    }
+  </div>
+</div>

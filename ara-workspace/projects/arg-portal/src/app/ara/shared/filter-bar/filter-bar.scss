@@ -1,0 +1,118 @@
+:host {
+  display: block;
+}
+
+.filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--page-padding);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+  }
+
+  // Search input field
+  &__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 0 0 260px;
+    min-width: 200px;
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 8px;
+    width: 14px;
+    height: 14px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  &__search-input {
+    width: 100%;
+    padding: 6px 8px 6px 30px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    color: var(--text-primary);
+    font-size: var(--font-sm);
+    font-family: var(--font-family);
+    outline: none;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+    &::placeholder { color: var(--text-muted); }
+
+    &:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2px rgba(0,196,179,0.15);
+    }
+  }
+
+  &__search-clear {
+    position: absolute;
+    right: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--r-sm);
+    color: var(--text-muted);
+
+    svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    &:hover { color: var(--text-secondary); background: var(--bg-card-hover); }
+  }
+
+  // Select dropdowns
+  &__select {
+    width: auto;
+    flex-shrink: 0;
+    min-width: 130px;
+  }
+
+  // Action buttons group
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  &__chevron--open {
+    transform: rotate(180deg);
+  }
+
+  // Right side extra slot
+  &__extra {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  // Advanced section
+  &__advanced {
+    padding: var(--s-4);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-lg);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--s-3);
+    font-size: var(--font-sm);
+  }
+}

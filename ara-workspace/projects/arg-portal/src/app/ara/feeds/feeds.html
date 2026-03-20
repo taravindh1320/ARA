@@ -1,0 +1,107 @@
+<div class="feeds">
+  <ara-page-header
+    title="Feeds"
+    subtitle="Monitor ingestion pipelines, data sources and feed health"
+    [breadcrumbs]="breadcrumbs"
+    lastRefresh="Today 10:22 AM (Live)"
+  >
+    <div slot="actions">
+      <button class="btn btn--ghost btn--sm">Configure Alerts</button>
+      <button class="btn btn--primary btn--sm">Refresh All</button>
+    </div>
+  </ara-page-header>
+
+  <!-- Health KPI Strip -->
+  <div class="feeds__kpi-strip">
+    <ara-kpi-card label="Active Feeds"    [value]="allFeeds.length.toString()" status="info"    trend="flat" />
+    <ara-kpi-card label="Healthy"         [value]="successCount.toString()"    status="success" trend="flat" />
+    <ara-kpi-card label="Running"         [value]="runningCount.toString()"    status="info"    trend="flat" />
+    <ara-kpi-card label="Failed/Stalled" [value]="failedCount.toString()"     status="danger"  trend="up"   />
+    <ara-kpi-card label="Anomalies"       [value]="anomalyCount.toString()"    status="warning" trend="up"   />
+  </div>
+
+  <!-- Region Filter -->
+  <div class="feeds__region-bar">
+    @for (r of regions; track r) {
+      <button
+        class="chip"
+        [class.chip--active]="selectedRegion() === r"
+        (click)="setRegion(r)">
+        {{ r }}
+      </button>
+    }
+  </div>
+
+  <!-- Feeds Table -->
+  <div class="card">
+    <table class="feeds-table">
+      <thead>
+        <tr>
+          <th>Feed Name</th>
+          <th>Source → Target</th>
+          <th>Frequency</th>
+          <th>Last Run</th>
+          <th>Next Run</th>
+          <th>Duration</th>
+          <th>Records In</th>
+          <th>Processed</th>
+          <th>Rejected</th>
+          <th>Coverage %</th>
+          <th>Region</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (feed of filteredFeeds; track feed.id) {
+          <tr [class.feeds-table__row--anomaly]="feed.anomaly">
+            <td class="feeds-table__name">
+              {{ feed.name }}
+              @if (feed.anomaly) {
+                <span class="feeds-table__anomaly-flag" [title]="feed.anomalyDetail">⚠</span>
+              }
+            </td>
+            <td class="feeds-table__route">
+              <span>{{ feed.source }}</span>
+              <svg viewBox="0 0 12 10" fill="none"><path d="M1 5h10M7 1l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>{{ feed.target }}</span>
+            </td>
+            <td>{{ feed.frequency }}</td>
+            <td class="feeds-table__date">{{ feed.lastRun }}</td>
+            <td class="feeds-table__date">{{ feed.nextRun }}</td>
+            <td>{{ feed.duration }}</td>
+            <td class="num">{{ feed.recordsIn | number }}</td>
+            <td class="num">{{ feed.recordsProcessed | number }}</td>
+            <td class="num" [class.rejected]="feed.recordsRejected > 0">
+              {{ feed.recordsRejected | number }}
+            </td>
+            <td>
+              <div class="feeds-table__coverage">
+                <div class="feeds-table__coverage-bar">
+                  <div class="feeds-table__coverage-fill"
+                       [style.width.%]="coveragePct(feed)"
+                       [class.feeds-table__coverage-fill--warn]="coveragePct(feed) < 95">
+                  </div>
+                </div>
+                <span>{{ coveragePct(feed) }}%</span>
+              </div>
+            </td>
+            <td>{{ feed.region }}</td>
+            <td>
+              <span class="badge badge--{{ statusClass(feed.status) }} badge--xs">{{ feed.status }}</span>
+            </td>
+          </tr>
+          @if (feed.anomaly && feed.anomalyDetail) {
+            <tr class="feeds-table__anomaly-row">
+              <td colspan="12">
+                <div class="feeds-table__anomaly-detail">
+                  <svg viewBox="0 0 14 14" fill="none"><path d="M7 1l6 11H1L7 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M7 5.5v3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="7" cy="10" r=".5" fill="currentColor"/></svg>
+                  {{ feed.anomalyDetail }}
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

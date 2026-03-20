@@ -1,0 +1,96 @@
+<div class="search-page">
+
+  <!-- Page Header -->
+  <ara-page-header
+    title="ARA Search"
+    subtitle="Search and manage ARA security records across all regions."
+    [breadcrumbs]="breadcrumbs"
+  >
+    <div slot="actions">
+      <button class="btn btn--secondary btn--sm">
+        <svg viewBox="0 0 14 14" fill="none" style="width:13px;height:13px">
+          <path d="M2 4.5h10M5 8.5h4M7 11.5h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Columns
+      </button>
+      <button class="btn btn--secondary btn--sm">
+        <svg viewBox="0 0 14 14" fill="none" style="width:13px;height:13px">
+          <path d="M7 1v9M4 7l3 3 3-3M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Export
+      </button>
+    </div>
+  </ara-page-header>
+
+  <!-- Filter Bar -->
+  <ara-filter-bar
+    searchPlaceholder="Search by ISIN, name, region..."
+    [showRegion]="true"
+    [showStatus]="true"
+    [showAdvanced]="true"
+    (searchChange)="onSearchChange($event)"
+    (applyFilter)="onApplyFilter($event)"
+    (clearFilter)="onClearFilter()"
+  />
+
+  <!-- Active filter chips -->
+  @if (activeFilters().length) {
+    <div class="search-page__chips">
+      <span class="text-xs text-muted">Active filters:</span>
+      @for (chip of activeFilters(); track chip) {
+        <span class="chip">
+          {{ chip }}
+          <span class="chip__remove" (click)="removeFilter(chip)">✕</span>
+        </span>
+      }
+      <button class="btn btn--ghost btn--sm" (click)="onClearFilter()">Clear all</button>
+    </div>
+  }
+
+  <!-- Action toolbar + record count -->
+  <div class="search-page__toolbar">
+    <div class="search-page__toolbar-left">
+      <span class="search-page__count">
+        <strong>{{ filteredData().length }}</strong>
+        <span class="text-muted"> of {{ allData.length }} records</span>
+      </span>
+      @if (selectedRows().length) {
+        <span class="badge badge--teal">{{ selectedRows().length }} selected</span>
+      }
+    </div>
+    <div class="search-page__toolbar-right">
+      @if (selectedRows().length) {
+        <button class="btn btn--secondary btn--sm">View Details</button>
+        <button class="btn btn--ghost btn--sm text-danger">Flag Exceptions</button>
+      }
+    </div>
+  </div>
+
+  <!-- AG Grid -->
+  <div class="search-page__grid-wrapper">
+    @if (filteredData().length === 0) {
+      <div class="empty-state">
+        <div class="empty-state__icon">🔍</div>
+        <div class="empty-state__title">No records found</div>
+        <div class="empty-state__body">
+          Try adjusting your search terms or clearing the active filters.
+        </div>
+        <button class="btn btn--ghost btn--sm" (click)="onClearFilter()">Clear filters</button>
+      </div>
+    } @else {
+      <ag-grid-angular
+        [theme]="theme"
+        [rowData]="filteredData()"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        [rowSelection]="rowSelection"
+        [getRowId]="getRowId"
+        [animateRows]="true"
+        (gridReady)="onGridReady($event)"
+        (selectionChanged)="onSelectionChanged($event)"
+        style="width: 100%; height: 100%;"
+      />
+    }
+  </div>
+
+</div>

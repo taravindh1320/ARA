@@ -1,0 +1,95 @@
+<div class="arg-wf">
+  <ara-page-header
+    title="Workflow"
+    subtitle="Review, approve or escalate pending change requests"
+    [breadcrumbs]="breadcrumbs"
+    lastRefresh="Today 10:45 AM"
+  />
+
+  <!-- KPI strip -->
+  <div class="arg-wf__kpi-strip">
+    <ara-kpi-card label="Total Items"    value="12"  trend="flat" status="info"    />
+    <ara-kpi-card label="Pending"        value="4"   trend="up"   delta="+1" status="warning" />
+    <ara-kpi-card label="In Review"      value="3"   trend="flat" status="info"    />
+    <ara-kpi-card label="Approved"       value="4"   trend="up"   status="success" />
+    <ara-kpi-card label="Overdue"        value="2"   trend="up"   delta="+1" status="danger"  />
+  </div>
+
+  <!-- Filter -->
+  <ara-filter-bar
+    searchPlaceholder="Search by reference, description, assignee..."
+    [showRegion]="true"
+    [showStatus]="true"
+    (searchChange)="onSearch($event)"
+  />
+
+  <!-- Grid + Detail layout -->
+  <div class="arg-wf__layout">
+    <div class="arg-wf__grid" [class.arg-wf__grid--drawer-open]="drawerOpen()">
+      <div class="ara-grid-container" style="height: 540px; margin-top: 12px;">
+        <ag-grid-angular
+          [theme]="theme"
+          [rowData]="filteredData()"
+          [columnDefs]="columnDefs"
+          [defaultColDef]="defaultColDef"
+          [getRowId]="getRowId"
+          rowSelection="single"
+          (gridReady)="onGridReady($event)"
+          (rowClicked)="onRowClicked($event)"
+          style="width: 100%; height: 100%;"
+        />
+      </div>
+    </div>
+
+    <!-- Drawer -->
+    @if (drawerOpen() && selectedItem()) {
+      <div class="arg-wf__drawer">
+        <div class="drawer-header">
+          <div class="drawer-header__left">
+            <span class="drawer-header__ref">{{ selectedItem()!.ref }}</span>
+            <span class="badge badge--{{ statusClass(selectedItem()!.status) }}">
+              {{ statusLabel(selectedItem()!.status) }}
+            </span>
+          </div>
+          <button class="drawer-close" (click)="closeDrawer()">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <div class="drawer-body">
+          <div class="drawer-desc">{{ selectedItem()!.description }}</div>
+
+          <div class="drawer-section">
+            <div class="drawer-section__title">Request Details</div>
+            <div class="drawer-row"><span>Type</span><strong>{{ selectedItem()!.type }}</strong></div>
+            <div class="drawer-row"><span>Priority</span>
+              <span class="badge badge--{{ priorityClass(selectedItem()!.priority) }} badge--xs">{{ selectedItem()!.priority }}</span>
+            </div>
+            <div class="drawer-row"><span>Region</span><strong>{{ selectedItem()!.region }}</strong></div>
+            <div class="drawer-row"><span>Submitted By</span><strong>{{ selectedItem()!.submittedBy }}</strong></div>
+            <div class="drawer-row"><span>Submitted Date</span><strong>{{ selectedItem()!.submittedDate }}</strong></div>
+            <div class="drawer-row"><span>Due Date</span>
+              <strong [class.overdue]="selectedItem()!.overdue">{{ selectedItem()!.dueDate }}</strong>
+            </div>
+            <div class="drawer-row"><span>Assigned To</span><strong>{{ selectedItem()!.assignedTo }}</strong></div>
+          </div>
+
+          @if (selectedItem()!.comments) {
+            <div class="drawer-section">
+              <div class="drawer-section__title">Comments</div>
+              <div class="drawer-comments">{{ selectedItem()!.comments }}</div>
+            </div>
+          }
+        </div>
+
+        @if (selectedItem()!.status === 'PENDING' || selectedItem()!.status === 'IN_REVIEW') {
+          <div class="drawer-actions">
+            <button class="btn btn--success btn--sm">Approve</button>
+            <button class="btn btn--warning btn--sm">Escalate</button>
+            <button class="btn btn--danger btn--sm">Reject</button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

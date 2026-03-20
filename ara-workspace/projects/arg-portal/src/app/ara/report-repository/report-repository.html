@@ -1,0 +1,123 @@
+<div class="report-repo">
+  <ara-page-header
+    title="Report Repository"
+    subtitle="Access, download and schedule ARA operational and compliance reports"
+    [breadcrumbs]="breadcrumbs"
+    lastRefresh="Today 10:00 AM"
+  >
+    <div slot="actions">
+      <button class="btn btn--ghost btn--sm">Schedule Report</button>
+      <button class="btn btn--primary btn--sm">Request Ad-hoc</button>
+    </div>
+  </ara-page-header>
+
+  <!-- Summary cards -->
+  <div class="report-repo__summary">
+    <div class="report-repo__summary-card">
+      <span class="report-repo__summary-val">{{ reports.length }}</span>
+      <span class="report-repo__summary-label">Total Reports</span>
+    </div>
+    <div class="report-repo__summary-card">
+      <span class="report-repo__summary-val" style="color: #34d399">
+        {{ countByStatus('AVAILABLE') }}
+      </span>
+      <span class="report-repo__summary-label">Available</span>
+    </div>
+    <div class="report-repo__summary-card">
+      <span class="report-repo__summary-val" style="color: var(--teal-400)">
+        {{ countByStatus('GENERATING') }}
+      </span>
+      <span class="report-repo__summary-label">Generating</span>
+    </div>
+    <div class="report-repo__summary-card">
+      <span class="report-repo__summary-val" style="color: #f87171">
+        {{ countByStatus('FAILED') }}
+      </span>
+      <span class="report-repo__summary-label">Failed</span>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="report-repo__filters">
+    <ara-filter-bar
+      searchPlaceholder="Search reports..."
+      [showRegion]="false"
+      [showStatus]="false"
+      (searchChange)="onSearch($event)"
+    />
+    <div class="report-repo__type-tabs">
+      @for (type of reportTypes; track type) {
+        <button
+          class="chip"
+          [class.chip--active]="selectedType() === type"
+          (click)="setType(type)">
+          {{ type }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Reports table -->
+  <div class="card">
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Report Name</th>
+          <th>Type</th>
+          <th>Frequency</th>
+          <th>Format</th>
+          <th>Region</th>
+          <th>Owner</th>
+          <th>Last Generated</th>
+          <th>Next Scheduled</th>
+          <th>Size</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (report of filteredReports; track report.id) {
+          <tr>
+            <td class="report-table__name">{{ report.name }}</td>
+            <td><span class="chip chip--sm">{{ report.type }}</span></td>
+            <td>{{ report.frequency }}</td>
+            <td>
+              <span class="report-table__format report-table__format--{{ report.format.toLowerCase() }}">
+                {{ report.format }}
+              </span>
+            </td>
+            <td>{{ report.region }}</td>
+            <td>{{ report.owner }}</td>
+            <td class="report-table__date">{{ report.lastGenerated }}</td>
+            <td class="report-table__date">{{ report.nextScheduled }}</td>
+            <td>{{ formatSize(report.sizeKb) }}</td>
+            <td>
+              <span class="badge badge--{{ statusClass(report.status) }} badge--xs">
+                {{ report.status }}
+              </span>
+            </td>
+            <td>
+              <div class="report-table__actions">
+                @if (report.status === 'AVAILABLE') {
+                  <button class="btn btn--ghost btn--xs" title="Download">
+                    <svg viewBox="0 0 14 14" fill="none"><path d="M7 2v7M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    Download
+                  </button>
+                }
+                @if (report.status === 'FAILED') {
+                  <button class="btn btn--ghost btn--xs" title="Retry">
+                    <svg viewBox="0 0 14 14" fill="none"><path d="M2 7a5 5 0 015-5 5 5 0 014.33 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M12 3.5V6h-2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Retry
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+        @if (filteredReports.length === 0) {
+          <tr><td colspan="11" class="report-table__empty">No reports match your filter criteria</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
