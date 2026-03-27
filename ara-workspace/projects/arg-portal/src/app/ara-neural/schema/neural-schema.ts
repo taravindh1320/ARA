@@ -1,92 +1,13 @@
 ﻿import { Component, computed, signal, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { PageHeaderComponent, Breadcrumb } from '../../ara/shared/page-header/page-header';
-
-// â”€â”€ JSON schema types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-export interface NeuralCentral {
-  bankAccount:     string;
-  accountStatus:   string;
-  accountType:     string;
-  region:          string;
-  country:         string;
-  lineOfBusiness:  string;
-  riskType:        string;
-}
-
-export interface NeuralSystem {
-  platform:     string;
-  database:     string;
-  balancePool:  string;
-  reconAccount: string;
-}
-
-export interface NeuralOwner { soeid: string; }
-
-export interface NeuralOwnership {
-  accountOwner:    NeuralOwner;
-  proofOwner:      NeuralOwner;
-  argReviewOwner:  NeuralOwner;
-}
-
-export interface NeuralAo  { soeid: string; name: string; status: string; }
-export interface NeuralPo  { soeid: string; name: string; }
-
-export interface NeuralApproval {
-  ao:            NeuralAo;
-  po:            NeuralPo;
-  reviewStatus:  string;
-  ddqStatus:     string;
-}
-
-export interface NeuralUsage {
-  bssAccountType:  string;
-  bserReportable:  string;
-}
-
-export interface NeuralRaw { [key: string]: string; }
-
-export interface NeuralRecord {
-  recordId:   string;
-  central:    NeuralCentral;
-  system:     NeuralSystem;
-  ownership:  NeuralOwnership;
-  approval:   NeuralApproval;
-  usage:      NeuralUsage;
-  raw:        NeuralRaw;
-}
-
-export interface GroupSummary {
-  region:           string;
-  recordCount:      number;
-  countryCount:     number;
-  bankAccountCount: number;
-  accountStatuses:  string[];
-  platforms:        string[];
-  databases:        string[];
-  aoNames:          string[];
-  poNames:          string[];
-  reviewStatuses:   string[];
-  ddqStatuses:      string[];
-}
-
-export interface NeuralGroup {
-  groupId:       string;
-  fullKey:       string;
-  displayTitle:  string;
-  records:       NeuralRecord[];
-  summary:       GroupSummary;
-}
-
-export interface NeuralSchema {
-  version:      string;
-  generatedAt:  string;
-  groups:       NeuralGroup[];
-}
-
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+import { NeuralSchemaService } from '../services/neural-schema.service';
+import {
+  FullKeySummary,
+  FullKeyDetail,
+  NeuralRecord,
+} from '../models/neural.models';
 
 @Component({
   selector: 'ara-neural-schema',
@@ -97,103 +18,106 @@ export interface NeuralSchema {
 })
 export class NeuralSchemaComponent implements OnInit, OnDestroy {
 
-  private readonly http = inject(HttpClient);
+  private readonly service = inject(NeuralSchemaService);
 
   readonly breadcrumbs: Breadcrumb[] = [
     { label: 'ARA Neural', route: '/ara-neural/schema' },
     { label: 'Schema' },
   ];
 
-  // â”€â”€ Reactive state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  private readonly _groups    = signal<NeuralGroup[]>([]);
-  readonly searchQuery        = signal('');
-  readonly selectedGroupId    = signal('');
-  readonly selectedRecordId   = signal('');
-  readonly detailOpen         = signal(false);
-  readonly loading            = signal(true);
-  readonly loadError          = signal('');
+  // ── Stage 1 state: left-panel summary list ───────────────────────────────
+  private readonly _summaries = signal<FullKeySummary[]>([]);
+  readonly listLoading         = signal(true);
+  readonly listError           = signal('');
+  readonly searchQuery         = signal('');
+  readonly selectedGroupId     = signal('');
 
-  /**
-   * Reveal step for animated canvas entry.
-   * -1 = blank  |  0 = center FULL_KEY node  |  1 = record branches
-   */
-  readonly revealStep = signal<number>(-1);
+  // ── Stage 2 state: canvas / graph detail ────────────────────────────────
+  private readonly _selectedDetail = signal<FullKeyDetail | null>(null);
+  readonly detailLoading            = signal(false);
+  readonly detailError              = signal('');
+  readonly selectedRecordId         = signal('');
+  readonly detailOpen               = signal(false);
+  readonly revealStep               = signal<number>(-1);
 
   private _timers: ReturnType<typeof setTimeout>[] = [];
 
-  // â”€â”€ Derived / computed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Derived ──────────────────────────────────────────────────────────────
 
-  get allGroups(): NeuralGroup[] { return this._groups(); }
+  /** Total count of all summaries loaded from the API. */
+  get totalCount(): number { return this._summaries().length; }
 
-  readonly filteredGroups = computed<NeuralGroup[]>(() => {
-    const all = this._groups();
+  /** Filtered left-panel list — client-side filter over lightweight summaries. */
+  readonly filteredSummaries = computed<FullKeySummary[]>(() => {
+    const all = this._summaries();
     const q   = this.searchQuery().toLowerCase().trim();
     if (!q) return all;
-    return all.filter(g =>
-      g.fullKey.toLowerCase().includes(q)                           ||
-      g.summary.region.toLowerCase().includes(q)                    ||
-      g.summary.aoNames.some(n => n.toLowerCase().includes(q))      ||
-      g.summary.platforms.some(p => p.toLowerCase().includes(q))    ||
-      g.summary.reviewStatuses.some(s => s.toLowerCase().includes(q))
+    return all.filter(s =>
+      s.fullKey.toLowerCase().includes(q)                       ||
+      s.region.toLowerCase().includes(q)                        ||
+      s.platforms.some(p => p.toLowerCase().includes(q))
     );
   });
 
-  readonly selectedGroup = computed<NeuralGroup | undefined>(() =>
-    this._groups().find(g => g.groupId === this.selectedGroupId())
+  /** Currently loaded detail for the selected FULL_KEY group. */
+  readonly selectedDetail = computed<FullKeyDetail | null>(
+    () => this._selectedDetail()
   );
 
-  readonly selectedRecord = computed<NeuralRecord | undefined>(() => {
-    const group = this.selectedGroup();
-    return group?.records.find(r => r.recordId === this.selectedRecordId());
-  });
+  /** Currently selected record within the detail group. */
+  readonly selectedRecord = computed<NeuralRecord | undefined>(() =>
+    this._selectedDetail()?.records.find(r => r.recordId === this.selectedRecordId())
+  );
 
+  /** Fields rendered in the detail drawer. */
   readonly detailFields = computed<Array<{ label: string; value: string; type?: string }>>(() => {
     const rec = this.selectedRecord();
     if (!rec) return [];
     return [
-      { label: 'Record ID',         value: rec.recordId },
-      { label: 'Full Key',          value: rec.raw['fullKey'] },
-      { label: 'Bank Account',      value: rec.central.bankAccount },
-      { label: 'Account Type',      value: rec.central.accountType },
-      { label: 'Account Status',    value: rec.central.accountStatus },
-      { label: 'Region',            value: rec.central.region },
-      { label: 'Country',           value: rec.central.country },
-      { label: 'Line of Business',  value: rec.central.lineOfBusiness },
-      { label: 'Risk Type',         value: rec.central.riskType },
-      { label: 'Platform',          value: rec.system.platform },
-      { label: 'Database',          value: rec.system.database },
-      { label: 'Balance Pool',      value: rec.system.balancePool },
-      { label: 'Recon Account',     value: rec.system.reconAccount },
-      { label: 'AO Name',           value: rec.approval.ao.name },
-      { label: 'AO SOEID',          value: rec.approval.ao.soeid },
-      { label: 'AO Status',         value: rec.approval.ao.status },
-      { label: 'PO Name',           value: rec.approval.po.name },
-      { label: 'PO SOEID',          value: rec.approval.po.soeid },
-      { label: 'Review Status',     value: rec.approval.reviewStatus, type: 'review' },
-      { label: 'DDQ Status',        value: rec.approval.ddqStatus },
-      { label: 'BSS Account Type',  value: rec.usage.bssAccountType },
-      { label: 'BSER Reportable',   value: rec.usage.bserReportable },
-      { label: 'ARG Review Owner',  value: rec.ownership.argReviewOwner.soeid },
-      { label: 'Account Owner',     value: rec.ownership.accountOwner.soeid },
-      { label: 'Proof Owner',       value: rec.ownership.proofOwner.soeid },
+      { label: 'Record ID',        value: rec.recordId },
+      { label: 'Full Key',         value: rec.raw['fullKey'] },
+      { label: 'Bank Account',     value: rec.central.bankAccount },
+      { label: 'Account Type',     value: rec.central.accountType },
+      { label: 'Account Status',   value: rec.central.accountStatus },
+      { label: 'Region',           value: rec.central.region },
+      { label: 'Country',          value: rec.central.country },
+      { label: 'Line of Business', value: rec.central.lineOfBusiness },
+      { label: 'Risk Type',        value: rec.central.riskType },
+      { label: 'Platform',         value: rec.system.platform },
+      { label: 'Database',         value: rec.system.database },
+      { label: 'Balance Pool',     value: rec.system.balancePool },
+      { label: 'Recon Account',    value: rec.system.reconAccount },
+      { label: 'AO Name',          value: rec.approval.ao.name },
+      { label: 'AO SOEID',         value: rec.approval.ao.soeid },
+      { label: 'AO Status',        value: rec.approval.ao.status },
+      { label: 'PO Name',          value: rec.approval.po.name },
+      { label: 'PO SOEID',         value: rec.approval.po.soeid },
+      { label: 'Review Status',    value: rec.approval.reviewStatus, type: 'review' },
+      { label: 'DDQ Status',       value: rec.approval.ddqStatus },
+      { label: 'BSS Account Type', value: rec.usage.bssAccountType },
+      { label: 'BSER Reportable',  value: rec.usage.bserReportable },
+      { label: 'ARG Review Owner', value: rec.ownership.argReviewOwner.soeid },
+      { label: 'Account Owner',    value: rec.ownership.accountOwner.soeid },
+      { label: 'Proof Owner',      value: rec.ownership.proofOwner.soeid },
     ];
   });
 
-  // â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
-    this.http.get<NeuralSchema>('assets/data/neural_schema.json').subscribe({
-      next: (schema) => {
-        this._groups.set(schema.groups ?? []);
-        this.loading.set(false);
-        if (schema.groups?.length > 0) {
-          this.selectGroup(schema.groups[0].groupId);
+    // Stage 1: load lightweight summary list — fast, no records[] included
+    this.service.getFullKeySummaries().subscribe({
+      next: (response) => {
+        this._summaries.set(response.items);
+        this.listLoading.set(false);
+        if (response.items.length > 0) {
+          this.selectGroup(response.items[0].groupId);
         }
       },
       error: (err) => {
-        this.loadError.set('Failed to load neural schema data. Please check assets/data/neural_schema.json.');
-        this.loading.set(false);
-        console.error('[NeuralSchema] Load error:', err);
+        this.listError.set('Failed to load FULL_KEY list. Please check the data source.');
+        this.listLoading.set(false);
+        console.error('[NeuralSchema] Summary load error:', err);
       },
     });
   }
@@ -202,7 +126,7 @@ export class NeuralSchemaComponent implements OnInit, OnDestroy {
     this._timers.forEach(t => clearTimeout(t));
   }
 
-  // â”€â”€ Selection actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Actions ───────────────────────────────────────────────────────────────
 
   selectGroup(groupId: string): void {
     if (this.selectedGroupId() === groupId) return;
@@ -210,15 +134,29 @@ export class NeuralSchemaComponent implements OnInit, OnDestroy {
     this._timers.forEach(t => clearTimeout(t));
     this._timers = [];
 
+    // Reset canvas state immediately
+    this.selectedGroupId.set(groupId);
     this.revealStep.set(-1);
     this.detailOpen.set(false);
     this.selectedRecordId.set('');
+    this.detailError.set('');
+    this.detailLoading.set(true);
+    this._selectedDetail.set(null);
 
-    this._timers.push(setTimeout(() => {
-      this.selectedGroupId.set(groupId);
-      this._timers.push(setTimeout(() => this.revealStep.set(0), 60));   // center node
-      this._timers.push(setTimeout(() => this.revealStep.set(1), 280));  // branches in
-    }, 40));
+    // Stage 2: fetch detail only for the selected FULL_KEY
+    this.service.getFullKeyDetail(groupId).subscribe({
+      next: (response) => {
+        this.detailLoading.set(false);
+        this._selectedDetail.set(response.detail);
+        this._timers.push(setTimeout(() => this.revealStep.set(0), 60));
+        this._timers.push(setTimeout(() => this.revealStep.set(1), 280));
+      },
+      error: (err) => {
+        this.detailLoading.set(false);
+        this.detailError.set('Failed to load lineage detail for this group.');
+        console.error('[NeuralSchema] Detail load error:', err);
+      },
+    });
   }
 
   selectRecord(recordId: string): void {
@@ -227,9 +165,9 @@ export class NeuralSchemaComponent implements OnInit, OnDestroy {
   }
 
   onSearch(q: string): void { this.searchQuery.set(q); }
-  toggleDetail(): void { this.detailOpen.update(v => !v); }
+  toggleDetail(): void      { this.detailOpen.update(v => !v); }
 
-  // â”€â”€ Badge style helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Badge style helpers ───────────────────────────────────────────────────
 
   reviewClass(status: string): string {
     const map: Record<string, string> = {
@@ -259,4 +197,3 @@ export class NeuralSchemaComponent implements OnInit, OnDestroy {
     return map[status] ?? 'badge--neutral';
   }
 }
-

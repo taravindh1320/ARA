@@ -1,8 +1,23 @@
 """
 excel_to_neural_json.py
 =======================
-Converts the ARA Neural input Excel (or CSV) file into a grouped JSON file
-that the Angular ARA Neural component can consume directly.
+Converts the ARA Neural input Excel (or CSV) file into TWO output files:
+
+  1. neural_schema.json         — Full detail (backend only, never served to browser).
+                                  Contains every record with all fields.
+  2. neural_schema_summary.json — Lightweight summary list (frontend, Stage 1).
+                                  Contains only per-group metadata; records[] stripped.
+
+Architecture
+------------
+  Frontend Stage 1  →  GET /api/ara-neural/fullkeys
+                        served from neural_schema_summary.json
+                        (or real backend endpoint in production)
+
+  Frontend Stage 2  →  GET /api/ara-neural/fullkeys/{groupId}
+                        served from neural_schema.json lookup
+                        (or real backend endpoint in production)
+                        Called ONLY when the user selects a FULL_KEY group.
 
 Usage
 -----
@@ -12,10 +27,11 @@ Usage
     # From Excel:
     python scripts/excel_to_neural_json.py --input input/ara_neural_input.xlsx
 
-    # Specify output path explicitly:
+    # Specify output paths explicitly:
     python scripts/excel_to_neural_json.py \
-        --input  input/ara_neural_input.xlsx \
-        --output ara-workspace/projects/arg-portal/src/assets/data/neural_schema.json
+        --input          input/ara_neural_input.xlsx \
+        --output         ara-workspace/projects/arg-portal/src/assets/data/neural_schema.json \
+        --summary-output ara-workspace/projects/arg-portal/src/assets/data/neural_schema_summary.json
 
 Requirements
 ------------
@@ -69,6 +85,11 @@ REQUIRED_COLUMNS: list[str] = [
 OUTPUT_DEFAULT = os.path.join(
     "ara-workspace", "projects", "arg-portal",
     "src", "assets", "data", "neural_schema.json"
+)
+
+SUMMARY_OUTPUT_DEFAULT = os.path.join(
+    "ara-workspace", "projects", "arg-portal",
+    "src", "assets", "data", "neural_schema_summary.json"
 )
 
 
@@ -251,10 +272,54 @@ def build_group(full_key: str, group_df: pd.DataFrame,
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Summary builder  (strips records[] — frontend Stage 1 payload)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def build_summary_item(group: dict) -> dict:
+    """Return a lightweight summary dict from a full group — no records[] array."""
+    s = group["summary"]
+    return {
+        "groupId":       group["groupId"],
+        "fullKey":       group["fullKey"],
+        "region":        s["region"],
+        "recordCount":   s["recordCount"],
+        "countryCount":  s["countryCount"],
+        "reviewStatuses": s["reviewStatuses"],
+        "platforms":     s["platforms"],
+    }
+
+
+def write_summary(groups: list[dict], summary_path: Path, generated_at: str) -> None:
+    """
+    Write neural_schema_summary.json — the frontend Stage 1 payload.
+
+    This file is safe to serve to the browser: it contains only group
+    metadata.  records[] (which may be thousands of rows per group) is
+    intentionally excluded.
+
+    In production this is replaced by a real API endpoint:
+        GET /api/ara-neural/fullkeys
+    """
+    items = [build_summary_item(g) for g in groups]
+    summary: dict = {
+        "version":     "1.0",
+        "generatedAt": generated_at,
+        "total":       len(items),
+        "page":        1,
+        "pageSize":    len(items),
+        "items":       items,
+    }
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(summary_path, "w", encoding="utf-8") as fh:
+        json.dump(summary, fh, indent=2, ensure_ascii=False)
+    print(f"[+] Summary written: {summary_path}  ({len(items)} items, no records[])")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Main conversion
 # ─────────────────────────────────────────────────────────────────────────────
 
-def convert(input_path: Path, output_path: Path) -> None:
+def convert(input_path: Path, output_path: Path, summary_path: Path) -> None:
     print(f"[+] Loading input  : {input_path}")
     df = load_dataframe(input_path)
 
@@ -270,20 +335,25 @@ def convert(input_path: Path, output_path: Path) -> None:
         group = build_group(str(full_key), group_df, group_index, record_counter)
         groups.append(group)
 
-    output: dict = {
+    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    # ── Full detail JSON (backend / mock only — never served to browser) ──────
+    full_output: dict = {
         "version":     "1.0",
-        "generatedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generatedAt": generated_at,
         "groups":      groups,
     }
-
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as fh:
-        json.dump(output, fh, indent=2, ensure_ascii=False)
+        json.dump(full_output, fh, indent=2, ensure_ascii=False)
 
     total_records = sum(len(g["records"]) for g in groups)
     print(f"[+] Groups written : {len(groups)}")
     print(f"[+] Records total  : {total_records}")
-    print(f"[+] Output written : {output_path}")
+    print(f"[+] Full JSON      : {output_path}")
+
+    # ── Summary JSON (frontend Stage 1 — records[] stripped) ─────────────────
+    write_summary(groups, summary_path, generated_at)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -354,7 +424,12 @@ def generate_excel_from_csv(csv_path: Path, xlsx_path: Path) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Convert ARA Neural Excel/CSV input to grouped JSON."
+        description=(
+            "Convert ARA Neural Excel/CSV input into TWO output files:\n"
+            "  1. neural_schema.json         — full detail (backend / mock only)\n"
+            "  2. neural_schema_summary.json — lightweight summaries (frontend Stage 1)"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
         "--input", "-i",
@@ -364,7 +439,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output", "-o",
         default=OUTPUT_DEFAULT,
-        help=f"Path to write neural_schema.json. Default: {OUTPUT_DEFAULT}",
+        help=f"Path to write neural_schema.json (full detail). Default: {OUTPUT_DEFAULT}",
+    )
+    parser.add_argument(
+        "--summary-output", "-s",
+        default=SUMMARY_OUTPUT_DEFAULT,
+        help=(
+            f"Path to write neural_schema_summary.json (frontend Stage 1, no records[]). "
+            f"Default: {SUMMARY_OUTPUT_DEFAULT}"
+        ),
     )
     parser.add_argument(
         "--generate-excel",
@@ -377,8 +460,9 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
-    input_path  = Path(args.input)
-    output_path = Path(args.output)
+    input_path   = Path(args.input)
+    output_path  = Path(args.output)
+    summary_path = Path(args.summary_output)
 
     if not input_path.exists():
         print(f"[ERROR] Input file not found: {input_path}", file=sys.stderr)
@@ -390,8 +474,8 @@ def main() -> None:
         print(f"[+] Generating Excel: {xlsx_path}")
         generate_excel_from_csv(input_path, xlsx_path)
 
-    # Run conversion
-    convert(input_path, output_path)
+    # Run conversion — emits both full JSON and summary JSON
+    convert(input_path, output_path, summary_path)
     print("[✓] Done.")
 
 

@@ -1,0 +1,173 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-03-27T14:03:05Z",
+  "total": 12,
+  "page": 1,
+  "pageSize": 12,
+  "items": [
+    {
+      "groupId": "fk_000001",
+      "fullKey": "FK-2024-EMEA-0114",
+      "region": "EMEA",
+      "recordCount": 3,
+      "countryCount": 2,
+      "reviewStatuses": [
+        "Approved",
+        "Under Review"
+      ],
+      "platforms": [
+        "TLM"
+      ]
+    },
+    {
+      "groupId": "fk_000002",
+      "fullKey": "FK-2024-EMEA-0227",
+      "region": "EMEA",
+      "recordCount": 2,
+      "countryCount": 1,
+      "reviewStatuses": [
+        "Under Review"
+      ],
+      "platforms": [
+        "TLM",
+        "Abacus"
+      ]
+    },
+    {
+      "groupId": "fk_000003",
+      "fullKey": "FK-2024-APAC-0388",
+      "region": "APAC",
+      "recordCount": 2,
+      "countryCount": 1,
+      "reviewStatuses": [
+        "Approved"
+      ],
+      "platforms": [
+        "TLM"
+      ]
+    },
+    {
+      "groupId": "fk_000004",
+      "fullKey": "FK-2024-APAC-0412",
+      "region": "APAC",
+      "recordCount": 3,
+      "countryCount": 1,
+      "reviewStatuses": [
+        "Pending"
+      ],
+      "platforms": [
+        "TLM",
+        "Abacus"
+      ]
+    },
+    {
+      "groupId": "fk_000005",
+      "fullKey": "FK-2024-NAM-0501",
+      "region": "NAM",
+      "recordCount": 2,
+      "countryCount": 1,
+      "reviewStatuses": [
+        "Approved"
+      ],
+      "platforms": [
+        "TLM"
+      ]
+    },
+    {
+      "groupId": "fk_000006",
+      "fullKey": "FK-2024-NAM-0578",
+      "region": "NAM",
+      "recordCount": 2,
+      "countryCount": 1,
+      "reviewStatuses": [
+        "Rejected"
+      ],
+      "platforms": [
+        "TLM",
+        "Abacus"
+      ]
+    },
+    {
+      "groupId": "fk_000007",
+      "fullKey": "FK-2024-LATAM-0631",
+      "region": "LATAM",
+      "recordCount": 1,
+      "countryCount": 1,
+      "reviewStatuses": [
+        "Approved"
+      ],
+      "platforms": [
+        "TLM"
+      ]
+    },
+    {
+      "groupId": "fk_000008",
+      "fullKey": "FK-2024-LATAM-0704",
+      "region": "LATAM",
+      "recordCount": 2,
+      "countryCount": 1,
+      "reviewStatuses": [
+        "Pending"
+      ],
+      "platforms": [
+        "TLM"
+      ]
+    },
+    {
+      "groupId": "fk_000009",
+      "fullKey": "FK-2024-EMEA-0819",
+      "region": "EMEA",
+      "recordCount": 2,
+      "countryCount": 1,
+      "reviewStatuses": [
+        "Under Review"
+      ],
+      "platforms": [
+        "TLM"
+      ]
+    },
+    {
+      "groupId": "fk_000010",
+      "fullKey": "FK-2024-APAC-0944",
+      "region": "APAC",
+      "recordCount": 3,
+      "countryCount": 1,
+      "reviewStatuses": [
+        "Approved",
+        "Under Review"
+      ],
+      "platforms": [
+        "Abacus",
+        "TLM"
+      ]
+    },
+    {
+      "groupId": "fk_000011",
+      "fullKey": "FK-2024-EMEA-0990",
+      "region": "EMEA",
+      "recordCount": 1,
+      "countryCount": 1,
+      "reviewStatuses": [
+        "Approved"
+      ],
+      "platforms": [
+        "TLM"
+      ]
+    },
+    {
+      "groupId": "fk_000012",
+      "fullKey": "FK-2024-NAM-0620",
+      "region": "NAM",
+      "recordCount": 2,
+      "countryCount": 1,
+      "reviewStatuses": [
+        "Pending",
+        "Approved"
+      ],
+      "platforms": [
+        "TLM",
+        "Abacus"
+      ]
+    }
+  ]
+}
