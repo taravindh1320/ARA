@@ -1,167 +1,92 @@
-import { Component, computed, signal, OnDestroy } from '@angular/core';
+﻿import { Component, computed, signal, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { PageHeaderComponent, Breadcrumb } from '../../ara/shared/page-header/page-header';
 
-export type ApprovalStatus = 'Approved' | 'Pending' | 'Rejected' | 'Under Review';
-export type MappingStatus  = 'Fully Mapped' | 'Partially Mapped' | 'Unmapped';
+// â”€â”€ JSON schema types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-export interface LineageRecord {
-  id:             string;
-  fullkey:        string;
-  region:         string;
-  country:        string;
-  abacusAccount:  string;
-  tlmAccount:     string;
-  aoName:         string;
-  aoId:           string;
-  argApprovedBy:  string;
-  approvalStatus: ApprovalStatus;
-  mappingStatus:  MappingStatus;
-  lastUpdated:    string;
-  comments:       string;
+export interface NeuralCentral {
+  bankAccount:     string;
+  accountStatus:   string;
+  accountType:     string;
+  region:          string;
+  country:         string;
+  lineOfBusiness:  string;
+  riskType:        string;
 }
 
-export interface ChainNode {
-  entityType: string;
-  value:      string;
-  subValue:   string;
-  colorClass: string;
+export interface NeuralSystem {
+  platform:     string;
+  database:     string;
+  balancePool:  string;
+  reconAccount: string;
 }
 
-// ── Mock data ─────────────────────────────────────────────────────────
-const MOCK_RECORDS: LineageRecord[] = [
-  {
-    id: 'LIN-001',
-    fullkey: 'FK-2024-EMEA-0114',
-    region: 'EMEA', country: 'UK',
-    abacusAccount: 'ABA-UK-88421',
-    tlmAccount: 'TLM-EMEA-3301-A',
-    aoName: 'Sarah Mitchell', aoId: 'AO-1042',
-    argApprovedBy: 'James Harrington',
-    approvalStatus: 'Approved',
-    mappingStatus: 'Fully Mapped',
-    lastUpdated: '2024-11-18',
-    comments: 'Fully reconciled. No exceptions outstanding.',
-  },
-  {
-    id: 'LIN-002',
-    fullkey: 'FK-2024-EMEA-0227',
-    region: 'EMEA', country: 'Germany',
-    abacusAccount: 'ABA-DE-44102',
-    tlmAccount: 'TLM-EMEA-4480-B',
-    aoName: 'Klaus Weber', aoId: 'AO-2017',
-    argApprovedBy: 'Pending',
-    approvalStatus: 'Under Review',
-    mappingStatus: 'Partially Mapped',
-    lastUpdated: '2024-11-20',
-    comments: 'TLM link re-established post-migration. ARG review in progress.',
-  },
-  {
-    id: 'LIN-003',
-    fullkey: 'FK-2024-APAC-0388',
-    region: 'APAC', country: 'Singapore',
-    abacusAccount: 'ABA-SG-22904',
-    tlmAccount: 'TLM-APAC-1122-C',
-    aoName: 'Priya Nair', aoId: 'AO-3055',
-    argApprovedBy: 'David Lim',
-    approvalStatus: 'Approved',
-    mappingStatus: 'Fully Mapped',
-    lastUpdated: '2024-11-15',
-    comments: 'Compliant. Annual review completed.',
-  },
-  {
-    id: 'LIN-004',
-    fullkey: 'FK-2024-APAC-0412',
-    region: 'APAC', country: 'Hong Kong',
-    abacusAccount: 'ABA-HK-61830',
-    tlmAccount: 'TLM-APAC-2240-D',
-    aoName: 'Tony Chan', aoId: 'AO-3112',
-    argApprovedBy: 'Unassigned',
-    approvalStatus: 'Pending',
-    mappingStatus: 'Partially Mapped',
-    lastUpdated: '2024-11-22',
-    comments: 'ARG approver not yet assigned. Escalated to team lead.',
-  },
-  {
-    id: 'LIN-005',
-    fullkey: 'FK-2024-NAM-0501',
-    region: 'NAM', country: 'USA',
-    abacusAccount: 'ABA-US-77410',
-    tlmAccount: 'TLM-NAM-8810-E',
-    aoName: 'Robert Finley', aoId: 'AO-1188',
-    argApprovedBy: 'Angela Torres',
-    approvalStatus: 'Approved',
-    mappingStatus: 'Fully Mapped',
-    lastUpdated: '2024-11-10',
-    comments: 'Routine approval cycle. No issues.',
-  },
-  {
-    id: 'LIN-006',
-    fullkey: 'FK-2024-NAM-0578',
-    region: 'NAM', country: 'Canada',
-    abacusAccount: 'ABA-CA-30021',
-    tlmAccount: 'TLM-NAM-9955-F',
-    aoName: 'Marie Leclerc', aoId: 'AO-1201',
-    argApprovedBy: 'Angela Torres',
-    approvalStatus: 'Rejected',
-    mappingStatus: 'Unmapped',
-    lastUpdated: '2024-11-19',
-    comments: 'Abacus account mismatch identified. Returned for correction.',
-  },
-  {
-    id: 'LIN-007',
-    fullkey: 'FK-2024-LATAM-0631',
-    region: 'LATAM', country: 'Brazil',
-    abacusAccount: 'ABA-BR-18844',
-    tlmAccount: 'TLM-LATAM-5501-G',
-    aoName: 'Carlos Mendes', aoId: 'AO-4088',
-    argApprovedBy: 'Sofia Peralta',
-    approvalStatus: 'Approved',
-    mappingStatus: 'Fully Mapped',
-    lastUpdated: '2024-11-14',
-    comments: 'Clean mapping. Approved in Q4 cycle.',
-  },
-  {
-    id: 'LIN-008',
-    fullkey: 'FK-2024-LATAM-0704',
-    region: 'LATAM', country: 'Mexico',
-    abacusAccount: 'ABA-MX-25510',
-    tlmAccount: 'TLM-LATAM-6610-H',
-    aoName: 'Isabella Ruiz', aoId: 'AO-4120',
-    argApprovedBy: 'Unassigned',
-    approvalStatus: 'Pending',
-    mappingStatus: 'Partially Mapped',
-    lastUpdated: '2024-11-23',
-    comments: 'New account. Initial mapping in progress.',
-  },
-  {
-    id: 'LIN-009',
-    fullkey: 'FK-2024-EMEA-0819',
-    region: 'EMEA', country: 'UAE',
-    abacusAccount: 'ABA-UAE-93210',
-    tlmAccount: 'TLM-EMEA-7740-I',
-    aoName: 'Omar Al-Rashid', aoId: 'AO-2206',
-    argApprovedBy: 'James Harrington',
-    approvalStatus: 'Under Review',
-    mappingStatus: 'Partially Mapped',
-    lastUpdated: '2024-11-21',
-    comments: 'Regional compliance check pending. Expected clearance by EOM.',
-  },
-  {
-    id: 'LIN-010',
-    fullkey: 'FK-2024-APAC-0944',
-    region: 'APAC', country: 'India',
-    abacusAccount: 'ABA-IN-40188',
-    tlmAccount: 'TLM-APAC-3388-J',
-    aoName: 'Ananya Sharma', aoId: 'AO-3280',
-    argApprovedBy: 'David Lim',
-    approvalStatus: 'Approved',
-    mappingStatus: 'Fully Mapped',
-    lastUpdated: '2024-11-12',
-    comments: 'Verified and approved. Part of bulk reconciliation batch.',
-  },
-];
+export interface NeuralOwner { soeid: string; }
+
+export interface NeuralOwnership {
+  accountOwner:    NeuralOwner;
+  proofOwner:      NeuralOwner;
+  argReviewOwner:  NeuralOwner;
+}
+
+export interface NeuralAo  { soeid: string; name: string; status: string; }
+export interface NeuralPo  { soeid: string; name: string; }
+
+export interface NeuralApproval {
+  ao:            NeuralAo;
+  po:            NeuralPo;
+  reviewStatus:  string;
+  ddqStatus:     string;
+}
+
+export interface NeuralUsage {
+  bssAccountType:  string;
+  bserReportable:  string;
+}
+
+export interface NeuralRaw { [key: string]: string; }
+
+export interface NeuralRecord {
+  recordId:   string;
+  central:    NeuralCentral;
+  system:     NeuralSystem;
+  ownership:  NeuralOwnership;
+  approval:   NeuralApproval;
+  usage:      NeuralUsage;
+  raw:        NeuralRaw;
+}
+
+export interface GroupSummary {
+  region:           string;
+  recordCount:      number;
+  countryCount:     number;
+  bankAccountCount: number;
+  accountStatuses:  string[];
+  platforms:        string[];
+  databases:        string[];
+  aoNames:          string[];
+  poNames:          string[];
+  reviewStatuses:   string[];
+  ddqStatuses:      string[];
+}
+
+export interface NeuralGroup {
+  groupId:       string;
+  fullKey:       string;
+  displayTitle:  string;
+  records:       NeuralRecord[];
+  summary:       GroupSummary;
+}
+
+export interface NeuralSchema {
+  version:      string;
+  generatedAt:  string;
+  groups:       NeuralGroup[];
+}
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Component({
   selector: 'ara-neural-schema',
@@ -170,164 +95,168 @@ const MOCK_RECORDS: LineageRecord[] = [
   templateUrl: './neural-schema.html',
   styleUrl: './neural-schema.scss',
 })
-export class NeuralSchemaComponent implements OnDestroy {
+export class NeuralSchemaComponent implements OnInit, OnDestroy {
+
+  private readonly http = inject(HttpClient);
 
   readonly breadcrumbs: Breadcrumb[] = [
     { label: 'ARA Neural', route: '/ara-neural/schema' },
     { label: 'Schema' },
   ];
 
-  searchQuery  = signal('');
-  selectedId   = signal<string>('LIN-001');
-  detailOpen   = signal(false);
-  selectedNode = signal<string | null>(null);
+  // â”€â”€ Reactive state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  private readonly _groups    = signal<NeuralGroup[]>([]);
+  readonly searchQuery        = signal('');
+  readonly selectedGroupId    = signal('');
+  readonly selectedRecordId   = signal('');
+  readonly detailOpen         = signal(false);
+  readonly loading            = signal(true);
+  readonly loadError          = signal('');
 
   /**
-   * Controls staged node reveal.
-   * -1 = canvas blank/resetting
-   *  0 = Fullkey visible
-   *  1 = + Abacus + its line
-   *  2 = + TLM   + its line
-   *  3 = + AO    + its line
-   *  4 = + Approver + its line  (all visible)
+   * Reveal step for animated canvas entry.
+   * -1 = blank  |  0 = center FULL_KEY node  |  1 = record branches
    */
-  revealStep = signal<number>(4); // start fully visible for initial load
+  readonly revealStep = signal<number>(-1);
 
   private _timers: ReturnType<typeof setTimeout>[] = [];
 
-  readonly allRecords = MOCK_RECORDS;
+  // â”€â”€ Derived / computed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  filteredRecords = computed<LineageRecord[]>(() => {
-    const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.allRecords;
-    return this.allRecords.filter(r =>
-      r.fullkey.toLowerCase().includes(q)       ||
-      r.region.toLowerCase().includes(q)        ||
-      r.country.toLowerCase().includes(q)       ||
-      r.abacusAccount.toLowerCase().includes(q) ||
-      r.tlmAccount.toLowerCase().includes(q)    ||
-      r.aoName.toLowerCase().includes(q)        ||
-      r.argApprovedBy.toLowerCase().includes(q)
+  get allGroups(): NeuralGroup[] { return this._groups(); }
+
+  readonly filteredGroups = computed<NeuralGroup[]>(() => {
+    const all = this._groups();
+    const q   = this.searchQuery().toLowerCase().trim();
+    if (!q) return all;
+    return all.filter(g =>
+      g.fullKey.toLowerCase().includes(q)                           ||
+      g.summary.region.toLowerCase().includes(q)                    ||
+      g.summary.aoNames.some(n => n.toLowerCase().includes(q))      ||
+      g.summary.platforms.some(p => p.toLowerCase().includes(q))    ||
+      g.summary.reviewStatuses.some(s => s.toLowerCase().includes(q))
     );
   });
 
-  selectedRecord = computed<LineageRecord | undefined>(() =>
-    this.allRecords.find(r => r.id === this.selectedId())
+  readonly selectedGroup = computed<NeuralGroup | undefined>(() =>
+    this._groups().find(g => g.groupId === this.selectedGroupId())
   );
 
-  chainNodes = computed<ChainNode[]>(() => {
+  readonly selectedRecord = computed<NeuralRecord | undefined>(() => {
+    const group = this.selectedGroup();
+    return group?.records.find(r => r.recordId === this.selectedRecordId());
+  });
+
+  readonly detailFields = computed<Array<{ label: string; value: string; type?: string }>>(() => {
     const rec = this.selectedRecord();
     if (!rec) return [];
     return [
-      {
-        entityType: 'Fullkey',
-        value:      rec.fullkey,
-        subValue:   `${rec.region} · ${rec.country}`,
-        colorClass: 'ns-node--fullkey',
-      },
-      {
-        entityType: 'Abacus Account',
-        value:      rec.abacusAccount,
-        subValue:   'Abacus System',
-        colorClass: 'ns-node--abacus',
-      },
-      {
-        entityType: 'TLM Account',
-        value:      rec.tlmAccount,
-        subValue:   'TLM System',
-        colorClass: 'ns-node--tlm',
-      },
-      {
-        entityType: 'AO Assigned',
-        value:      rec.aoName,
-        subValue:   rec.aoId,
-        colorClass: 'ns-node--ao',
-      },
-      {
-        entityType: 'ARG Approver',
-        value:      rec.argApprovedBy,
-        subValue:   rec.approvalStatus,
-        colorClass: 'ns-node--approver',
-      },
+      { label: 'Record ID',         value: rec.recordId },
+      { label: 'Full Key',          value: rec.raw['fullKey'] },
+      { label: 'Bank Account',      value: rec.central.bankAccount },
+      { label: 'Account Type',      value: rec.central.accountType },
+      { label: 'Account Status',    value: rec.central.accountStatus },
+      { label: 'Region',            value: rec.central.region },
+      { label: 'Country',           value: rec.central.country },
+      { label: 'Line of Business',  value: rec.central.lineOfBusiness },
+      { label: 'Risk Type',         value: rec.central.riskType },
+      { label: 'Platform',          value: rec.system.platform },
+      { label: 'Database',          value: rec.system.database },
+      { label: 'Balance Pool',      value: rec.system.balancePool },
+      { label: 'Recon Account',     value: rec.system.reconAccount },
+      { label: 'AO Name',           value: rec.approval.ao.name },
+      { label: 'AO SOEID',          value: rec.approval.ao.soeid },
+      { label: 'AO Status',         value: rec.approval.ao.status },
+      { label: 'PO Name',           value: rec.approval.po.name },
+      { label: 'PO SOEID',          value: rec.approval.po.soeid },
+      { label: 'Review Status',     value: rec.approval.reviewStatus, type: 'review' },
+      { label: 'DDQ Status',        value: rec.approval.ddqStatus },
+      { label: 'BSS Account Type',  value: rec.usage.bssAccountType },
+      { label: 'BSER Reportable',   value: rec.usage.bserReportable },
+      { label: 'ARG Review Owner',  value: rec.ownership.argReviewOwner.soeid },
+      { label: 'Account Owner',     value: rec.ownership.accountOwner.soeid },
+      { label: 'Proof Owner',       value: rec.ownership.proofOwner.soeid },
     ];
   });
 
-  detailFields = computed<Array<{ label: string; value: string; type?: string }>>(() => {
-    const rec = this.selectedRecord();
-    if (!rec) return [];
-    return [
-      { label: 'Record ID',         value: rec.id },
-      { label: 'Fullkey',           value: rec.fullkey },
-      { label: 'Region',            value: rec.region },
-      { label: 'Country',           value: rec.country },
-      { label: 'Abacus Account',    value: rec.abacusAccount },
-      { label: 'TLM Account',       value: rec.tlmAccount },
-      { label: 'AO Name',           value: rec.aoName },
-      { label: 'AO ID',             value: rec.aoId },
-      { label: 'ARG Approver',      value: rec.argApprovedBy },
-      { label: 'Approval Status',   value: rec.approvalStatus,  type: 'approval' },
-      { label: 'Mapping Status',    value: rec.mappingStatus,   type: 'mapping'  },
-      { label: 'Last Updated',      value: rec.lastUpdated },
-    ];
-  });
+  // â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  select(id: string): void {
-    if (this.selectedId() === id) return;  // no-op on same record
-
-    // cancel any in-flight animation timers
-    this._timers.forEach(t => clearTimeout(t));
-    this._timers = [];
-
-    // reset canvas to blank, swap data, then stagger nodes in
-    this.revealStep.set(-1);
-    this.detailOpen.set(false);
-
-    const push = (delay: number, step: number) =>
-      this._timers.push(setTimeout(() => this.revealStep.set(step), delay));
-
-    // swap the actual data after a very brief blank frame so Angular
-    // rerenders the new record values before nodes fade in
-    this._timers.push(setTimeout(() => {
-      this.selectedId.set(id);
-      push(60,  0);   // Fullkey
-      push(240, 1);   // Abacus  + line
-      push(420, 2);   // TLM     + line
-      push(600, 3);   // AO      + line
-      push(780, 4);   // Approver + line
-    }, 40));
+  ngOnInit(): void {
+    this.http.get<NeuralSchema>('assets/data/neural_schema.json').subscribe({
+      next: (schema) => {
+        this._groups.set(schema.groups ?? []);
+        this.loading.set(false);
+        if (schema.groups?.length > 0) {
+          this.selectGroup(schema.groups[0].groupId);
+        }
+      },
+      error: (err) => {
+        this.loadError.set('Failed to load neural schema data. Please check assets/data/neural_schema.json.');
+        this.loading.set(false);
+        console.error('[NeuralSchema] Load error:', err);
+      },
+    });
   }
-  onSearch(q: string): void { this.searchQuery.set(q); }
 
   ngOnDestroy(): void {
     this._timers.forEach(t => clearTimeout(t));
   }
-  toggleDetail(): void { this.detailOpen.update(v => !v); }
-  openDetail(node: string): void { this.selectedNode.set(node); this.detailOpen.set(true); }
 
-  approvalClass(s: ApprovalStatus): string {
-    const map: Record<ApprovalStatus, string> = {
+  // â”€â”€ Selection actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  selectGroup(groupId: string): void {
+    if (this.selectedGroupId() === groupId) return;
+
+    this._timers.forEach(t => clearTimeout(t));
+    this._timers = [];
+
+    this.revealStep.set(-1);
+    this.detailOpen.set(false);
+    this.selectedRecordId.set('');
+
+    this._timers.push(setTimeout(() => {
+      this.selectedGroupId.set(groupId);
+      this._timers.push(setTimeout(() => this.revealStep.set(0), 60));   // center node
+      this._timers.push(setTimeout(() => this.revealStep.set(1), 280));  // branches in
+    }, 40));
+  }
+
+  selectRecord(recordId: string): void {
+    this.selectedRecordId.set(recordId);
+    this.detailOpen.set(true);
+  }
+
+  onSearch(q: string): void { this.searchQuery.set(q); }
+  toggleDetail(): void { this.detailOpen.update(v => !v); }
+
+  // â”€â”€ Badge style helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  reviewClass(status: string): string {
+    const map: Record<string, string> = {
       'Approved':     'badge--success',
       'Pending':      'badge--warning',
       'Rejected':     'badge--danger',
       'Under Review': 'badge--info',
     };
-    return map[s] ?? 'badge--neutral';
+    return map[status] ?? 'badge--neutral';
   }
 
-  mappingClass(s: MappingStatus): string {
-    const map: Record<MappingStatus, string> = {
-      'Fully Mapped':     'badge--success',
-      'Partially Mapped': 'badge--warning',
-      'Unmapped':         'badge--danger',
-    };
-    return map[s] ?? 'badge--neutral';
-  }
-
-  regionBadge(r: string): string {
+  ddqClass(status: string): string {
     const map: Record<string, string> = {
-      EMEA: 'chip--emea', APAC: 'chip--apac',
-      LATAM: 'chip--latam', NAM: 'chip--nam',
+      'Completed':   'badge--success',
+      'In Progress': 'badge--info',
+      'Not Started': 'badge--neutral',
     };
-    return map[r] ?? '';
+    return map[status] ?? 'badge--neutral';
+  }
+
+  accountStatusClass(status: string): string {
+    const map: Record<string, string> = {
+      'Active':    'badge--success',
+      'Inactive':  'badge--danger',
+      'Suspended': 'badge--warning',
+    };
+    return map[status] ?? 'badge--neutral';
   }
 }
+

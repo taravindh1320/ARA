@@ -27,6 +27,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/arg-portal/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "projects/arg-portal/src/assets",
+                "output": "assets"
               }
             ],
             "styles": ["projects/arg-portal/src/styles.scss"]

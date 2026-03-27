@@ -1,0 +1,2237 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-03-27T12:02:02Z",
+  "groups": [
+    {
+      "groupId": "fk_000001",
+      "fullKey": "FK-2024-EMEA-0114",
+      "displayTitle": "FK-2024-EMEA-0114",
+      "records": [
+        {
+          "recordId": "rec_000001",
+          "central": {
+            "bankAccount": "BARC-UK-88421",
+            "accountStatus": "Active",
+            "accountType": "Nostro",
+            "region": "EMEA",
+            "country": "UK",
+            "lineOfBusiness": "Fixed Income",
+            "riskType": "Credit"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_EMEA",
+            "balancePool": "BP-EMEA-001",
+            "reconAccount": "TLM-EMEA-3301-A"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "SM12345"
+            },
+            "proofOwner": {
+              "soeid": "PO98765"
+            },
+            "argReviewOwner": {
+              "soeid": "jh44201"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-1042",
+              "name": "Sarah Mitchell",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "PO98765",
+              "name": "David Harrington"
+            },
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-EMEA-0114",
+            "bankAccount": "BARC-UK-88421",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_EMEA",
+            "reconBalancePool": "BP-EMEA-001",
+            "reconAccount": "TLM-EMEA-3301-A",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "SM12345",
+            "proofOwnerSoeid": "PO98765",
+            "bankAccountType": "Nostro",
+            "region": "EMEA",
+            "country": "UK",
+            "aoSoeId": "AO-1042",
+            "aoName": "Sarah Mitchell",
+            "lineOfBusiness": "Fixed Income",
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes",
+            "riskType": "Credit",
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed",
+            "argReviewOwner": "jh44201",
+            "poSoeid": "PO98765",
+            "poName": "David Harrington",
+            "aoStatus": "Active"
+          }
+        },
+        {
+          "recordId": "rec_000002",
+          "central": {
+            "bankAccount": "HSBC-UK-22104",
+            "accountStatus": "Active",
+            "accountType": "Vostro",
+            "region": "EMEA",
+            "country": "UK",
+            "lineOfBusiness": "Fixed Income",
+            "riskType": "Market"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_EMEA",
+            "balancePool": "BP-EMEA-001",
+            "reconAccount": "TLM-EMEA-3301-B"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "SM12345"
+            },
+            "proofOwner": {
+              "soeid": "PO98765"
+            },
+            "argReviewOwner": {
+              "soeid": "jh44201"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-1042",
+              "name": "Sarah Mitchell",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "PO98765",
+              "name": "David Harrington"
+            },
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed"
+          },
+          "usage": {
+            "bssAccountType": "External",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-EMEA-0114",
+            "bankAccount": "HSBC-UK-22104",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_EMEA",
+            "reconBalancePool": "BP-EMEA-001",
+            "reconAccount": "TLM-EMEA-3301-B",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "SM12345",
+            "proofOwnerSoeid": "PO98765",
+            "bankAccountType": "Vostro",
+            "region": "EMEA",
+            "country": "UK",
+            "aoSoeId": "AO-1042",
+            "aoName": "Sarah Mitchell",
+            "lineOfBusiness": "Fixed Income",
+            "bssAccountType": "External",
+            "bserReportable": "Yes",
+            "riskType": "Market",
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed",
+            "argReviewOwner": "jh44201",
+            "poSoeid": "PO98765",
+            "poName": "David Harrington",
+            "aoStatus": "Active"
+          }
+        },
+        {
+          "recordId": "rec_000003",
+          "central": {
+            "bankAccount": "BARC-IE-55302",
+            "accountStatus": "Active",
+            "accountType": "Nostro",
+            "region": "EMEA",
+            "country": "Ireland",
+            "lineOfBusiness": "Fixed Income",
+            "riskType": "Credit"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_EMEA",
+            "balancePool": "BP-EMEA-002",
+            "reconAccount": "TLM-EMEA-3301-C"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "SM12345"
+            },
+            "proofOwner": {
+              "soeid": "PO98765"
+            },
+            "argReviewOwner": {
+              "soeid": "jh44201"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-1042",
+              "name": "Sarah Mitchell",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "PO98765",
+              "name": "David Harrington"
+            },
+            "reviewStatus": "Under Review",
+            "ddqStatus": "In Progress"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "No"
+          },
+          "raw": {
+            "fullKey": "FK-2024-EMEA-0114",
+            "bankAccount": "BARC-IE-55302",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_EMEA",
+            "reconBalancePool": "BP-EMEA-002",
+            "reconAccount": "TLM-EMEA-3301-C",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "SM12345",
+            "proofOwnerSoeid": "PO98765",
+            "bankAccountType": "Nostro",
+            "region": "EMEA",
+            "country": "Ireland",
+            "aoSoeId": "AO-1042",
+            "aoName": "Sarah Mitchell",
+            "lineOfBusiness": "Fixed Income",
+            "bssAccountType": "Internal",
+            "bserReportable": "No",
+            "riskType": "Credit",
+            "reviewStatus": "Under Review",
+            "ddqStatus": "In Progress",
+            "argReviewOwner": "jh44201",
+            "poSoeid": "PO98765",
+            "poName": "David Harrington",
+            "aoStatus": "Active"
+          }
+        }
+      ],
+      "summary": {
+        "region": "EMEA",
+        "recordCount": 3,
+        "countryCount": 2,
+        "bankAccountCount": 3,
+        "accountStatuses": [
+          "Active"
+        ],
+        "platforms": [
+          "TLM"
+        ],
+        "databases": [
+          "TLM_PROD_EMEA"
+        ],
+        "aoNames": [
+          "Sarah Mitchell"
+        ],
+        "poNames": [
+          "David Harrington"
+        ],
+        "reviewStatuses": [
+          "Approved",
+          "Under Review"
+        ],
+        "ddqStatuses": [
+          "Completed",
+          "In Progress"
+        ]
+      }
+    },
+    {
+      "groupId": "fk_000002",
+      "fullKey": "FK-2024-EMEA-0227",
+      "displayTitle": "FK-2024-EMEA-0227",
+      "records": [
+        {
+          "recordId": "rec_000004",
+          "central": {
+            "bankAccount": "DEUT-DE-44102",
+            "accountStatus": "Suspended",
+            "accountType": "Nostro",
+            "region": "EMEA",
+            "country": "Germany",
+            "lineOfBusiness": "Equities",
+            "riskType": "Operational"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_EMEA",
+            "balancePool": "BP-EMEA-003",
+            "reconAccount": "TLM-EMEA-4480-B"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "KW20117"
+            },
+            "proofOwner": {
+              "soeid": "LF88021"
+            },
+            "argReviewOwner": {
+              "soeid": "jh44201"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-2017",
+              "name": "Klaus Weber",
+              "status": "Pending"
+            },
+            "po": {
+              "soeid": "LF88021",
+              "name": "Laura Fischer"
+            },
+            "reviewStatus": "Under Review",
+            "ddqStatus": "Not Started"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-EMEA-0227",
+            "bankAccount": "DEUT-DE-44102",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_EMEA",
+            "reconBalancePool": "BP-EMEA-003",
+            "reconAccount": "TLM-EMEA-4480-B",
+            "accountStatus": "Suspended",
+            "accountOwnerSoeid": "KW20117",
+            "proofOwnerSoeid": "LF88021",
+            "bankAccountType": "Nostro",
+            "region": "EMEA",
+            "country": "Germany",
+            "aoSoeId": "AO-2017",
+            "aoName": "Klaus Weber",
+            "lineOfBusiness": "Equities",
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes",
+            "riskType": "Operational",
+            "reviewStatus": "Under Review",
+            "ddqStatus": "Not Started",
+            "argReviewOwner": "jh44201",
+            "poSoeid": "LF88021",
+            "poName": "Laura Fischer",
+            "aoStatus": "Pending"
+          }
+        },
+        {
+          "recordId": "rec_000005",
+          "central": {
+            "bankAccount": "COMO-DE-77240",
+            "accountStatus": "Active",
+            "accountType": "Current",
+            "region": "EMEA",
+            "country": "Germany",
+            "lineOfBusiness": "Equities",
+            "riskType": "Market"
+          },
+          "system": {
+            "platform": "Abacus",
+            "database": "ABACUS_PROD",
+            "balancePool": "BP-EMEA-003",
+            "reconAccount": "ABA-DE-77240"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "KW20117"
+            },
+            "proofOwner": {
+              "soeid": "LF88021"
+            },
+            "argReviewOwner": {
+              "soeid": "jh44201"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-2017",
+              "name": "Klaus Weber",
+              "status": "Pending"
+            },
+            "po": {
+              "soeid": "LF88021",
+              "name": "Laura Fischer"
+            },
+            "reviewStatus": "Under Review",
+            "ddqStatus": "In Progress"
+          },
+          "usage": {
+            "bssAccountType": "External",
+            "bserReportable": "No"
+          },
+          "raw": {
+            "fullKey": "FK-2024-EMEA-0227",
+            "bankAccount": "COMO-DE-77240",
+            "reconSystemPlatform": "Abacus",
+            "reconSystemDatabase": "ABACUS_PROD",
+            "reconBalancePool": "BP-EMEA-003",
+            "reconAccount": "ABA-DE-77240",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "KW20117",
+            "proofOwnerSoeid": "LF88021",
+            "bankAccountType": "Current",
+            "region": "EMEA",
+            "country": "Germany",
+            "aoSoeId": "AO-2017",
+            "aoName": "Klaus Weber",
+            "lineOfBusiness": "Equities",
+            "bssAccountType": "External",
+            "bserReportable": "No",
+            "riskType": "Market",
+            "reviewStatus": "Under Review",
+            "ddqStatus": "In Progress",
+            "argReviewOwner": "jh44201",
+            "poSoeid": "LF88021",
+            "poName": "Laura Fischer",
+            "aoStatus": "Pending"
+          }
+        }
+      ],
+      "summary": {
+        "region": "EMEA",
+        "recordCount": 2,
+        "countryCount": 1,
+        "bankAccountCount": 2,
+        "accountStatuses": [
+          "Suspended",
+          "Active"
+        ],
+        "platforms": [
+          "TLM",
+          "Abacus"
+        ],
+        "databases": [
+          "TLM_PROD_EMEA",
+          "ABACUS_PROD"
+        ],
+        "aoNames": [
+          "Klaus Weber"
+        ],
+        "poNames": [
+          "Laura Fischer"
+        ],
+        "reviewStatuses": [
+          "Under Review"
+        ],
+        "ddqStatuses": [
+          "Not Started",
+          "In Progress"
+        ]
+      }
+    },
+    {
+      "groupId": "fk_000003",
+      "fullKey": "FK-2024-APAC-0388",
+      "displayTitle": "FK-2024-APAC-0388",
+      "records": [
+        {
+          "recordId": "rec_000006",
+          "central": {
+            "bankAccount": "UOB-SG-22904",
+            "accountStatus": "Active",
+            "accountType": "Nostro",
+            "region": "APAC",
+            "country": "Singapore",
+            "lineOfBusiness": "Treasury",
+            "riskType": "Liquidity"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_APAC",
+            "balancePool": "BP-APAC-001",
+            "reconAccount": "TLM-APAC-1122-C"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "PN30550"
+            },
+            "proofOwner": {
+              "soeid": "DL77410"
+            },
+            "argReviewOwner": {
+              "soeid": "dl77410"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-3055",
+              "name": "Priya Nair",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "DL77410",
+              "name": "David Lim"
+            },
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-APAC-0388",
+            "bankAccount": "UOB-SG-22904",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_APAC",
+            "reconBalancePool": "BP-APAC-001",
+            "reconAccount": "TLM-APAC-1122-C",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "PN30550",
+            "proofOwnerSoeid": "DL77410",
+            "bankAccountType": "Nostro",
+            "region": "APAC",
+            "country": "Singapore",
+            "aoSoeId": "AO-3055",
+            "aoName": "Priya Nair",
+            "lineOfBusiness": "Treasury",
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes",
+            "riskType": "Liquidity",
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed",
+            "argReviewOwner": "dl77410",
+            "poSoeid": "DL77410",
+            "poName": "David Lim",
+            "aoStatus": "Active"
+          }
+        },
+        {
+          "recordId": "rec_000007",
+          "central": {
+            "bankAccount": "DBS-SG-38811",
+            "accountStatus": "Active",
+            "accountType": "Savings",
+            "region": "APAC",
+            "country": "Singapore",
+            "lineOfBusiness": "Treasury",
+            "riskType": "Liquidity"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_APAC",
+            "balancePool": "BP-APAC-001",
+            "reconAccount": "TLM-APAC-1122-D"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "PN30550"
+            },
+            "proofOwner": {
+              "soeid": "DL77410"
+            },
+            "argReviewOwner": {
+              "soeid": "dl77410"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-3055",
+              "name": "Priya Nair",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "DL77410",
+              "name": "David Lim"
+            },
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-APAC-0388",
+            "bankAccount": "DBS-SG-38811",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_APAC",
+            "reconBalancePool": "BP-APAC-001",
+            "reconAccount": "TLM-APAC-1122-D",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "PN30550",
+            "proofOwnerSoeid": "DL77410",
+            "bankAccountType": "Savings",
+            "region": "APAC",
+            "country": "Singapore",
+            "aoSoeId": "AO-3055",
+            "aoName": "Priya Nair",
+            "lineOfBusiness": "Treasury",
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes",
+            "riskType": "Liquidity",
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed",
+            "argReviewOwner": "dl77410",
+            "poSoeid": "DL77410",
+            "poName": "David Lim",
+            "aoStatus": "Active"
+          }
+        }
+      ],
+      "summary": {
+        "region": "APAC",
+        "recordCount": 2,
+        "countryCount": 1,
+        "bankAccountCount": 2,
+        "accountStatuses": [
+          "Active"
+        ],
+        "platforms": [
+          "TLM"
+        ],
+        "databases": [
+          "TLM_PROD_APAC"
+        ],
+        "aoNames": [
+          "Priya Nair"
+        ],
+        "poNames": [
+          "David Lim"
+        ],
+        "reviewStatuses": [
+          "Approved"
+        ],
+        "ddqStatuses": [
+          "Completed"
+        ]
+      }
+    },
+    {
+      "groupId": "fk_000004",
+      "fullKey": "FK-2024-APAC-0412",
+      "displayTitle": "FK-2024-APAC-0412",
+      "records": [
+        {
+          "recordId": "rec_000008",
+          "central": {
+            "bankAccount": "HKMA-HK-61830",
+            "accountStatus": "Active",
+            "accountType": "Nostro",
+            "region": "APAC",
+            "country": "Hong Kong",
+            "lineOfBusiness": "Derivatives",
+            "riskType": "Credit"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_APAC",
+            "balancePool": "BP-APAC-002",
+            "reconAccount": "TLM-APAC-2240-D"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "TC31120"
+            },
+            "proofOwner": {
+              "soeid": "WC55902"
+            },
+            "argReviewOwner": {
+              "soeid": ""
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-3112",
+              "name": "Tony Chan",
+              "status": "Pending"
+            },
+            "po": {
+              "soeid": "WC55902",
+              "name": "Wendy Chen"
+            },
+            "reviewStatus": "Pending",
+            "ddqStatus": "Not Started"
+          },
+          "usage": {
+            "bssAccountType": "External",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-APAC-0412",
+            "bankAccount": "HKMA-HK-61830",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_APAC",
+            "reconBalancePool": "BP-APAC-002",
+            "reconAccount": "TLM-APAC-2240-D",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "TC31120",
+            "proofOwnerSoeid": "WC55902",
+            "bankAccountType": "Nostro",
+            "region": "APAC",
+            "country": "Hong Kong",
+            "aoSoeId": "AO-3112",
+            "aoName": "Tony Chan",
+            "lineOfBusiness": "Derivatives",
+            "bssAccountType": "External",
+            "bserReportable": "Yes",
+            "riskType": "Credit",
+            "reviewStatus": "Pending",
+            "ddqStatus": "Not Started",
+            "argReviewOwner": "",
+            "poSoeid": "WC55902",
+            "poName": "Wendy Chen",
+            "aoStatus": "Pending"
+          }
+        },
+        {
+          "recordId": "rec_000009",
+          "central": {
+            "bankAccount": "BOCH-HK-99021",
+            "accountStatus": "Inactive",
+            "accountType": "Current",
+            "region": "APAC",
+            "country": "Hong Kong",
+            "lineOfBusiness": "Derivatives",
+            "riskType": "Operational"
+          },
+          "system": {
+            "platform": "Abacus",
+            "database": "ABACUS_PROD",
+            "balancePool": "BP-APAC-002",
+            "reconAccount": "ABA-HK-99021"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "TC31120"
+            },
+            "proofOwner": {
+              "soeid": "WC55902"
+            },
+            "argReviewOwner": {
+              "soeid": ""
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-3112",
+              "name": "Tony Chan",
+              "status": "Inactive"
+            },
+            "po": {
+              "soeid": "WC55902",
+              "name": "Wendy Chen"
+            },
+            "reviewStatus": "Pending",
+            "ddqStatus": "Not Started"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "No"
+          },
+          "raw": {
+            "fullKey": "FK-2024-APAC-0412",
+            "bankAccount": "BOCH-HK-99021",
+            "reconSystemPlatform": "Abacus",
+            "reconSystemDatabase": "ABACUS_PROD",
+            "reconBalancePool": "BP-APAC-002",
+            "reconAccount": "ABA-HK-99021",
+            "accountStatus": "Inactive",
+            "accountOwnerSoeid": "TC31120",
+            "proofOwnerSoeid": "WC55902",
+            "bankAccountType": "Current",
+            "region": "APAC",
+            "country": "Hong Kong",
+            "aoSoeId": "AO-3112",
+            "aoName": "Tony Chan",
+            "lineOfBusiness": "Derivatives",
+            "bssAccountType": "Internal",
+            "bserReportable": "No",
+            "riskType": "Operational",
+            "reviewStatus": "Pending",
+            "ddqStatus": "Not Started",
+            "argReviewOwner": "",
+            "poSoeid": "WC55902",
+            "poName": "Wendy Chen",
+            "aoStatus": "Inactive"
+          }
+        },
+        {
+          "recordId": "rec_000010",
+          "central": {
+            "bankAccount": "STAN-HK-14402",
+            "accountStatus": "Active",
+            "accountType": "Vostro",
+            "region": "APAC",
+            "country": "Hong Kong",
+            "lineOfBusiness": "Derivatives",
+            "riskType": "Market"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_APAC",
+            "balancePool": "BP-APAC-003",
+            "reconAccount": "TLM-APAC-2240-E"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "TC31120"
+            },
+            "proofOwner": {
+              "soeid": "WC55902"
+            },
+            "argReviewOwner": {
+              "soeid": ""
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-3112",
+              "name": "Tony Chan",
+              "status": "Pending"
+            },
+            "po": {
+              "soeid": "WC55902",
+              "name": "Wendy Chen"
+            },
+            "reviewStatus": "Pending",
+            "ddqStatus": "Not Started"
+          },
+          "usage": {
+            "bssAccountType": "External",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-APAC-0412",
+            "bankAccount": "STAN-HK-14402",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_APAC",
+            "reconBalancePool": "BP-APAC-003",
+            "reconAccount": "TLM-APAC-2240-E",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "TC31120",
+            "proofOwnerSoeid": "WC55902",
+            "bankAccountType": "Vostro",
+            "region": "APAC",
+            "country": "Hong Kong",
+            "aoSoeId": "AO-3112",
+            "aoName": "Tony Chan",
+            "lineOfBusiness": "Derivatives",
+            "bssAccountType": "External",
+            "bserReportable": "Yes",
+            "riskType": "Market",
+            "reviewStatus": "Pending",
+            "ddqStatus": "Not Started",
+            "argReviewOwner": "",
+            "poSoeid": "WC55902",
+            "poName": "Wendy Chen",
+            "aoStatus": "Pending"
+          }
+        }
+      ],
+      "summary": {
+        "region": "APAC",
+        "recordCount": 3,
+        "countryCount": 1,
+        "bankAccountCount": 3,
+        "accountStatuses": [
+          "Active",
+          "Inactive"
+        ],
+        "platforms": [
+          "TLM",
+          "Abacus"
+        ],
+        "databases": [
+          "TLM_PROD_APAC",
+          "ABACUS_PROD"
+        ],
+        "aoNames": [
+          "Tony Chan"
+        ],
+        "poNames": [
+          "Wendy Chen"
+        ],
+        "reviewStatuses": [
+          "Pending"
+        ],
+        "ddqStatuses": [
+          "Not Started"
+        ]
+      }
+    },
+    {
+      "groupId": "fk_000005",
+      "fullKey": "FK-2024-NAM-0501",
+      "displayTitle": "FK-2024-NAM-0501",
+      "records": [
+        {
+          "recordId": "rec_000011",
+          "central": {
+            "bankAccount": "JPMC-US-77410",
+            "accountStatus": "Active",
+            "accountType": "Nostro",
+            "region": "NAM",
+            "country": "USA",
+            "lineOfBusiness": "Prime Brokerage",
+            "riskType": "Credit"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_NAM",
+            "balancePool": "BP-NAM-001",
+            "reconAccount": "TLM-NAM-8810-E"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "RF11880"
+            },
+            "proofOwner": {
+              "soeid": "AT20014"
+            },
+            "argReviewOwner": {
+              "soeid": "at20014"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-1188",
+              "name": "Robert Finley",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "AT20014",
+              "name": "Angela Torres"
+            },
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed"
+          },
+          "usage": {
+            "bssAccountType": "External",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-NAM-0501",
+            "bankAccount": "JPMC-US-77410",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_NAM",
+            "reconBalancePool": "BP-NAM-001",
+            "reconAccount": "TLM-NAM-8810-E",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "RF11880",
+            "proofOwnerSoeid": "AT20014",
+            "bankAccountType": "Nostro",
+            "region": "NAM",
+            "country": "USA",
+            "aoSoeId": "AO-1188",
+            "aoName": "Robert Finley",
+            "lineOfBusiness": "Prime Brokerage",
+            "bssAccountType": "External",
+            "bserReportable": "Yes",
+            "riskType": "Credit",
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed",
+            "argReviewOwner": "at20014",
+            "poSoeid": "AT20014",
+            "poName": "Angela Torres",
+            "aoStatus": "Active"
+          }
+        },
+        {
+          "recordId": "rec_000012",
+          "central": {
+            "bankAccount": "BONY-US-55210",
+            "accountStatus": "Active",
+            "accountType": "Vostro",
+            "region": "NAM",
+            "country": "USA",
+            "lineOfBusiness": "Prime Brokerage",
+            "riskType": "Market"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_NAM",
+            "balancePool": "BP-NAM-001",
+            "reconAccount": "TLM-NAM-8810-F"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "RF11880"
+            },
+            "proofOwner": {
+              "soeid": "AT20014"
+            },
+            "argReviewOwner": {
+              "soeid": "at20014"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-1188",
+              "name": "Robert Finley",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "AT20014",
+              "name": "Angela Torres"
+            },
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-NAM-0501",
+            "bankAccount": "BONY-US-55210",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_NAM",
+            "reconBalancePool": "BP-NAM-001",
+            "reconAccount": "TLM-NAM-8810-F",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "RF11880",
+            "proofOwnerSoeid": "AT20014",
+            "bankAccountType": "Vostro",
+            "region": "NAM",
+            "country": "USA",
+            "aoSoeId": "AO-1188",
+            "aoName": "Robert Finley",
+            "lineOfBusiness": "Prime Brokerage",
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes",
+            "riskType": "Market",
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed",
+            "argReviewOwner": "at20014",
+            "poSoeid": "AT20014",
+            "poName": "Angela Torres",
+            "aoStatus": "Active"
+          }
+        }
+      ],
+      "summary": {
+        "region": "NAM",
+        "recordCount": 2,
+        "countryCount": 1,
+        "bankAccountCount": 2,
+        "accountStatuses": [
+          "Active"
+        ],
+        "platforms": [
+          "TLM"
+        ],
+        "databases": [
+          "TLM_PROD_NAM"
+        ],
+        "aoNames": [
+          "Robert Finley"
+        ],
+        "poNames": [
+          "Angela Torres"
+        ],
+        "reviewStatuses": [
+          "Approved"
+        ],
+        "ddqStatuses": [
+          "Completed"
+        ]
+      }
+    },
+    {
+      "groupId": "fk_000006",
+      "fullKey": "FK-2024-NAM-0578",
+      "displayTitle": "FK-2024-NAM-0578",
+      "records": [
+        {
+          "recordId": "rec_000013",
+          "central": {
+            "bankAccount": "RBC-CA-30021",
+            "accountStatus": "Active",
+            "accountType": "Nostro",
+            "region": "NAM",
+            "country": "Canada",
+            "lineOfBusiness": "Commodities",
+            "riskType": "Operational"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_NAM",
+            "balancePool": "BP-NAM-002",
+            "reconAccount": "TLM-NAM-9955-F"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "ML12010"
+            },
+            "proofOwner": {
+              "soeid": "AT20014"
+            },
+            "argReviewOwner": {
+              "soeid": "at20014"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-1201",
+              "name": "Marie Leclerc",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "AT20014",
+              "name": "Angela Torres"
+            },
+            "reviewStatus": "Rejected",
+            "ddqStatus": "Not Started"
+          },
+          "usage": {
+            "bssAccountType": "External",
+            "bserReportable": "No"
+          },
+          "raw": {
+            "fullKey": "FK-2024-NAM-0578",
+            "bankAccount": "RBC-CA-30021",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_NAM",
+            "reconBalancePool": "BP-NAM-002",
+            "reconAccount": "TLM-NAM-9955-F",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "ML12010",
+            "proofOwnerSoeid": "AT20014",
+            "bankAccountType": "Nostro",
+            "region": "NAM",
+            "country": "Canada",
+            "aoSoeId": "AO-1201",
+            "aoName": "Marie Leclerc",
+            "lineOfBusiness": "Commodities",
+            "bssAccountType": "External",
+            "bserReportable": "No",
+            "riskType": "Operational",
+            "reviewStatus": "Rejected",
+            "ddqStatus": "Not Started",
+            "argReviewOwner": "at20014",
+            "poSoeid": "AT20014",
+            "poName": "Angela Torres",
+            "aoStatus": "Active"
+          }
+        },
+        {
+          "recordId": "rec_000014",
+          "central": {
+            "bankAccount": "TD-CA-40110",
+            "accountStatus": "Active",
+            "accountType": "Current",
+            "region": "NAM",
+            "country": "Canada",
+            "lineOfBusiness": "Commodities",
+            "riskType": "Credit"
+          },
+          "system": {
+            "platform": "Abacus",
+            "database": "ABACUS_PROD",
+            "balancePool": "BP-NAM-002",
+            "reconAccount": "ABA-CA-40110"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "ML12010"
+            },
+            "proofOwner": {
+              "soeid": "AT20014"
+            },
+            "argReviewOwner": {
+              "soeid": "at20014"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-1201",
+              "name": "Marie Leclerc",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "AT20014",
+              "name": "Angela Torres"
+            },
+            "reviewStatus": "Rejected",
+            "ddqStatus": "Not Started"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "No"
+          },
+          "raw": {
+            "fullKey": "FK-2024-NAM-0578",
+            "bankAccount": "TD-CA-40110",
+            "reconSystemPlatform": "Abacus",
+            "reconSystemDatabase": "ABACUS_PROD",
+            "reconBalancePool": "BP-NAM-002",
+            "reconAccount": "ABA-CA-40110",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "ML12010",
+            "proofOwnerSoeid": "AT20014",
+            "bankAccountType": "Current",
+            "region": "NAM",
+            "country": "Canada",
+            "aoSoeId": "AO-1201",
+            "aoName": "Marie Leclerc",
+            "lineOfBusiness": "Commodities",
+            "bssAccountType": "Internal",
+            "bserReportable": "No",
+            "riskType": "Credit",
+            "reviewStatus": "Rejected",
+            "ddqStatus": "Not Started",
+            "argReviewOwner": "at20014",
+            "poSoeid": "AT20014",
+            "poName": "Angela Torres",
+            "aoStatus": "Active"
+          }
+        }
+      ],
+      "summary": {
+        "region": "NAM",
+        "recordCount": 2,
+        "countryCount": 1,
+        "bankAccountCount": 2,
+        "accountStatuses": [
+          "Active"
+        ],
+        "platforms": [
+          "TLM",
+          "Abacus"
+        ],
+        "databases": [
+          "TLM_PROD_NAM",
+          "ABACUS_PROD"
+        ],
+        "aoNames": [
+          "Marie Leclerc"
+        ],
+        "poNames": [
+          "Angela Torres"
+        ],
+        "reviewStatuses": [
+          "Rejected"
+        ],
+        "ddqStatuses": [
+          "Not Started"
+        ]
+      }
+    },
+    {
+      "groupId": "fk_000007",
+      "fullKey": "FK-2024-LATAM-0631",
+      "displayTitle": "FK-2024-LATAM-0631",
+      "records": [
+        {
+          "recordId": "rec_000015",
+          "central": {
+            "bankAccount": "BRAD-BR-18844",
+            "accountStatus": "Active",
+            "accountType": "Nostro",
+            "region": "LATAM",
+            "country": "Brazil",
+            "lineOfBusiness": "Retail Banking",
+            "riskType": "Credit"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_LATAM",
+            "balancePool": "BP-LATAM-001",
+            "reconAccount": "TLM-LATAM-5501-G"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "CM40880"
+            },
+            "proofOwner": {
+              "soeid": "SP66031"
+            },
+            "argReviewOwner": {
+              "soeid": "sp66031"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-4088",
+              "name": "Carlos Mendes",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "SP66031",
+              "name": "Sofia Peralta"
+            },
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-LATAM-0631",
+            "bankAccount": "BRAD-BR-18844",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_LATAM",
+            "reconBalancePool": "BP-LATAM-001",
+            "reconAccount": "TLM-LATAM-5501-G",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "CM40880",
+            "proofOwnerSoeid": "SP66031",
+            "bankAccountType": "Nostro",
+            "region": "LATAM",
+            "country": "Brazil",
+            "aoSoeId": "AO-4088",
+            "aoName": "Carlos Mendes",
+            "lineOfBusiness": "Retail Banking",
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes",
+            "riskType": "Credit",
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed",
+            "argReviewOwner": "sp66031",
+            "poSoeid": "SP66031",
+            "poName": "Sofia Peralta",
+            "aoStatus": "Active"
+          }
+        }
+      ],
+      "summary": {
+        "region": "LATAM",
+        "recordCount": 1,
+        "countryCount": 1,
+        "bankAccountCount": 1,
+        "accountStatuses": [
+          "Active"
+        ],
+        "platforms": [
+          "TLM"
+        ],
+        "databases": [
+          "TLM_PROD_LATAM"
+        ],
+        "aoNames": [
+          "Carlos Mendes"
+        ],
+        "poNames": [
+          "Sofia Peralta"
+        ],
+        "reviewStatuses": [
+          "Approved"
+        ],
+        "ddqStatuses": [
+          "Completed"
+        ]
+      }
+    },
+    {
+      "groupId": "fk_000008",
+      "fullKey": "FK-2024-LATAM-0704",
+      "displayTitle": "FK-2024-LATAM-0704",
+      "records": [
+        {
+          "recordId": "rec_000016",
+          "central": {
+            "bankAccount": "BBVA-MX-25510",
+            "accountStatus": "Active",
+            "accountType": "Nostro",
+            "region": "LATAM",
+            "country": "Mexico",
+            "lineOfBusiness": "Retail Banking",
+            "riskType": "Market"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_LATAM",
+            "balancePool": "BP-LATAM-002",
+            "reconAccount": "TLM-LATAM-6610-H"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "IR41200"
+            },
+            "proofOwner": {
+              "soeid": "SP66031"
+            },
+            "argReviewOwner": {
+              "soeid": "sp66031"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-4120",
+              "name": "Isabella Ruiz",
+              "status": "Pending"
+            },
+            "po": {
+              "soeid": "SP66031",
+              "name": "Sofia Peralta"
+            },
+            "reviewStatus": "Pending",
+            "ddqStatus": "In Progress"
+          },
+          "usage": {
+            "bssAccountType": "External",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-LATAM-0704",
+            "bankAccount": "BBVA-MX-25510",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_LATAM",
+            "reconBalancePool": "BP-LATAM-002",
+            "reconAccount": "TLM-LATAM-6610-H",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "IR41200",
+            "proofOwnerSoeid": "SP66031",
+            "bankAccountType": "Nostro",
+            "region": "LATAM",
+            "country": "Mexico",
+            "aoSoeId": "AO-4120",
+            "aoName": "Isabella Ruiz",
+            "lineOfBusiness": "Retail Banking",
+            "bssAccountType": "External",
+            "bserReportable": "Yes",
+            "riskType": "Market",
+            "reviewStatus": "Pending",
+            "ddqStatus": "In Progress",
+            "argReviewOwner": "sp66031",
+            "poSoeid": "SP66031",
+            "poName": "Sofia Peralta",
+            "aoStatus": "Pending"
+          }
+        },
+        {
+          "recordId": "rec_000017",
+          "central": {
+            "bankAccount": "CITI-MX-66301",
+            "accountStatus": "Inactive",
+            "accountType": "Current",
+            "region": "LATAM",
+            "country": "Mexico",
+            "lineOfBusiness": "Retail Banking",
+            "riskType": "Operational"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_LATAM",
+            "balancePool": "BP-LATAM-002",
+            "reconAccount": "TLM-LATAM-6610-I"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "IR41200"
+            },
+            "proofOwner": {
+              "soeid": "SP66031"
+            },
+            "argReviewOwner": {
+              "soeid": "sp66031"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-4120",
+              "name": "Isabella Ruiz",
+              "status": "Inactive"
+            },
+            "po": {
+              "soeid": "SP66031",
+              "name": "Sofia Peralta"
+            },
+            "reviewStatus": "Pending",
+            "ddqStatus": "Not Started"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "No"
+          },
+          "raw": {
+            "fullKey": "FK-2024-LATAM-0704",
+            "bankAccount": "CITI-MX-66301",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_LATAM",
+            "reconBalancePool": "BP-LATAM-002",
+            "reconAccount": "TLM-LATAM-6610-I",
+            "accountStatus": "Inactive",
+            "accountOwnerSoeid": "IR41200",
+            "proofOwnerSoeid": "SP66031",
+            "bankAccountType": "Current",
+            "region": "LATAM",
+            "country": "Mexico",
+            "aoSoeId": "AO-4120",
+            "aoName": "Isabella Ruiz",
+            "lineOfBusiness": "Retail Banking",
+            "bssAccountType": "Internal",
+            "bserReportable": "No",
+            "riskType": "Operational",
+            "reviewStatus": "Pending",
+            "ddqStatus": "Not Started",
+            "argReviewOwner": "sp66031",
+            "poSoeid": "SP66031",
+            "poName": "Sofia Peralta",
+            "aoStatus": "Inactive"
+          }
+        }
+      ],
+      "summary": {
+        "region": "LATAM",
+        "recordCount": 2,
+        "countryCount": 1,
+        "bankAccountCount": 2,
+        "accountStatuses": [
+          "Active",
+          "Inactive"
+        ],
+        "platforms": [
+          "TLM"
+        ],
+        "databases": [
+          "TLM_PROD_LATAM"
+        ],
+        "aoNames": [
+          "Isabella Ruiz"
+        ],
+        "poNames": [
+          "Sofia Peralta"
+        ],
+        "reviewStatuses": [
+          "Pending"
+        ],
+        "ddqStatuses": [
+          "In Progress",
+          "Not Started"
+        ]
+      }
+    },
+    {
+      "groupId": "fk_000009",
+      "fullKey": "FK-2024-EMEA-0819",
+      "displayTitle": "FK-2024-EMEA-0819",
+      "records": [
+        {
+          "recordId": "rec_000018",
+          "central": {
+            "bankAccount": "NBD-UAE-93210",
+            "accountStatus": "Active",
+            "accountType": "Nostro",
+            "region": "EMEA",
+            "country": "UAE",
+            "lineOfBusiness": "Treasury",
+            "riskType": "Liquidity"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_EMEA",
+            "balancePool": "BP-EMEA-004",
+            "reconAccount": "TLM-EMEA-7740-I"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "OR22060"
+            },
+            "proofOwner": {
+              "soeid": "JH44201"
+            },
+            "argReviewOwner": {
+              "soeid": "jh44201"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-2206",
+              "name": "Omar Al-Rashid",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "JH44201",
+              "name": "James Harrington"
+            },
+            "reviewStatus": "Under Review",
+            "ddqStatus": "In Progress"
+          },
+          "usage": {
+            "bssAccountType": "External",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-EMEA-0819",
+            "bankAccount": "NBD-UAE-93210",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_EMEA",
+            "reconBalancePool": "BP-EMEA-004",
+            "reconAccount": "TLM-EMEA-7740-I",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "OR22060",
+            "proofOwnerSoeid": "JH44201",
+            "bankAccountType": "Nostro",
+            "region": "EMEA",
+            "country": "UAE",
+            "aoSoeId": "AO-2206",
+            "aoName": "Omar Al-Rashid",
+            "lineOfBusiness": "Treasury",
+            "bssAccountType": "External",
+            "bserReportable": "Yes",
+            "riskType": "Liquidity",
+            "reviewStatus": "Under Review",
+            "ddqStatus": "In Progress",
+            "argReviewOwner": "jh44201",
+            "poSoeid": "JH44201",
+            "poName": "James Harrington",
+            "aoStatus": "Active"
+          }
+        },
+        {
+          "recordId": "rec_000019",
+          "central": {
+            "bankAccount": "ADCB-UAE-44021",
+            "accountStatus": "Active",
+            "accountType": "Vostro",
+            "region": "EMEA",
+            "country": "UAE",
+            "lineOfBusiness": "Treasury",
+            "riskType": "Credit"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_EMEA",
+            "balancePool": "BP-EMEA-004",
+            "reconAccount": "TLM-EMEA-7740-J"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "OR22060"
+            },
+            "proofOwner": {
+              "soeid": "JH44201"
+            },
+            "argReviewOwner": {
+              "soeid": "jh44201"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-2206",
+              "name": "Omar Al-Rashid",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "JH44201",
+              "name": "James Harrington"
+            },
+            "reviewStatus": "Under Review",
+            "ddqStatus": "Not Started"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-EMEA-0819",
+            "bankAccount": "ADCB-UAE-44021",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_EMEA",
+            "reconBalancePool": "BP-EMEA-004",
+            "reconAccount": "TLM-EMEA-7740-J",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "OR22060",
+            "proofOwnerSoeid": "JH44201",
+            "bankAccountType": "Vostro",
+            "region": "EMEA",
+            "country": "UAE",
+            "aoSoeId": "AO-2206",
+            "aoName": "Omar Al-Rashid",
+            "lineOfBusiness": "Treasury",
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes",
+            "riskType": "Credit",
+            "reviewStatus": "Under Review",
+            "ddqStatus": "Not Started",
+            "argReviewOwner": "jh44201",
+            "poSoeid": "JH44201",
+            "poName": "James Harrington",
+            "aoStatus": "Active"
+          }
+        }
+      ],
+      "summary": {
+        "region": "EMEA",
+        "recordCount": 2,
+        "countryCount": 1,
+        "bankAccountCount": 2,
+        "accountStatuses": [
+          "Active"
+        ],
+        "platforms": [
+          "TLM"
+        ],
+        "databases": [
+          "TLM_PROD_EMEA"
+        ],
+        "aoNames": [
+          "Omar Al-Rashid"
+        ],
+        "poNames": [
+          "James Harrington"
+        ],
+        "reviewStatuses": [
+          "Under Review"
+        ],
+        "ddqStatuses": [
+          "In Progress",
+          "Not Started"
+        ]
+      }
+    },
+    {
+      "groupId": "fk_000010",
+      "fullKey": "FK-2024-APAC-0944",
+      "displayTitle": "FK-2024-APAC-0944",
+      "records": [
+        {
+          "recordId": "rec_000020",
+          "central": {
+            "bankAccount": "SBIN-IN-40188",
+            "accountStatus": "Active",
+            "accountType": "Nostro",
+            "region": "APAC",
+            "country": "India",
+            "lineOfBusiness": "Investment Banking",
+            "riskType": "Market"
+          },
+          "system": {
+            "platform": "Abacus",
+            "database": "ABACUS_PROD",
+            "balancePool": "BP-APAC-004",
+            "reconAccount": "ABA-IN-40188"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "AS32800"
+            },
+            "proofOwner": {
+              "soeid": "DL77410"
+            },
+            "argReviewOwner": {
+              "soeid": "dl77410"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-3280",
+              "name": "Ananya Sharma",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "DL77410",
+              "name": "David Lim"
+            },
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-APAC-0944",
+            "bankAccount": "SBIN-IN-40188",
+            "reconSystemPlatform": "Abacus",
+            "reconSystemDatabase": "ABACUS_PROD",
+            "reconBalancePool": "BP-APAC-004",
+            "reconAccount": "ABA-IN-40188",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "AS32800",
+            "proofOwnerSoeid": "DL77410",
+            "bankAccountType": "Nostro",
+            "region": "APAC",
+            "country": "India",
+            "aoSoeId": "AO-3280",
+            "aoName": "Ananya Sharma",
+            "lineOfBusiness": "Investment Banking",
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes",
+            "riskType": "Market",
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed",
+            "argReviewOwner": "dl77410",
+            "poSoeid": "DL77410",
+            "poName": "David Lim",
+            "aoStatus": "Active"
+          }
+        },
+        {
+          "recordId": "rec_000021",
+          "central": {
+            "bankAccount": "ICICI-IN-72341",
+            "accountStatus": "Active",
+            "accountType": "Current",
+            "region": "APAC",
+            "country": "India",
+            "lineOfBusiness": "Investment Banking",
+            "riskType": "Credit"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_APAC",
+            "balancePool": "BP-APAC-004",
+            "reconAccount": "TLM-APAC-3388-J"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "AS32800"
+            },
+            "proofOwner": {
+              "soeid": "DL77410"
+            },
+            "argReviewOwner": {
+              "soeid": "dl77410"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-3280",
+              "name": "Ananya Sharma",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "DL77410",
+              "name": "David Lim"
+            },
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed"
+          },
+          "usage": {
+            "bssAccountType": "External",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-APAC-0944",
+            "bankAccount": "ICICI-IN-72341",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_APAC",
+            "reconBalancePool": "BP-APAC-004",
+            "reconAccount": "TLM-APAC-3388-J",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "AS32800",
+            "proofOwnerSoeid": "DL77410",
+            "bankAccountType": "Current",
+            "region": "APAC",
+            "country": "India",
+            "aoSoeId": "AO-3280",
+            "aoName": "Ananya Sharma",
+            "lineOfBusiness": "Investment Banking",
+            "bssAccountType": "External",
+            "bserReportable": "Yes",
+            "riskType": "Credit",
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed",
+            "argReviewOwner": "dl77410",
+            "poSoeid": "DL77410",
+            "poName": "David Lim",
+            "aoStatus": "Active"
+          }
+        },
+        {
+          "recordId": "rec_000022",
+          "central": {
+            "bankAccount": "HDFC-IN-88110",
+            "accountStatus": "Suspended",
+            "accountType": "Nostro",
+            "region": "APAC",
+            "country": "India",
+            "lineOfBusiness": "Investment Banking",
+            "riskType": "Operational"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_APAC",
+            "balancePool": "BP-APAC-004",
+            "reconAccount": "TLM-APAC-3388-K"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "AS32800"
+            },
+            "proofOwner": {
+              "soeid": "DL77410"
+            },
+            "argReviewOwner": {
+              "soeid": "dl77410"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-3280",
+              "name": "Ananya Sharma",
+              "status": "Pending"
+            },
+            "po": {
+              "soeid": "DL77410",
+              "name": "David Lim"
+            },
+            "reviewStatus": "Under Review",
+            "ddqStatus": "Not Started"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "No"
+          },
+          "raw": {
+            "fullKey": "FK-2024-APAC-0944",
+            "bankAccount": "HDFC-IN-88110",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_APAC",
+            "reconBalancePool": "BP-APAC-004",
+            "reconAccount": "TLM-APAC-3388-K",
+            "accountStatus": "Suspended",
+            "accountOwnerSoeid": "AS32800",
+            "proofOwnerSoeid": "DL77410",
+            "bankAccountType": "Nostro",
+            "region": "APAC",
+            "country": "India",
+            "aoSoeId": "AO-3280",
+            "aoName": "Ananya Sharma",
+            "lineOfBusiness": "Investment Banking",
+            "bssAccountType": "Internal",
+            "bserReportable": "No",
+            "riskType": "Operational",
+            "reviewStatus": "Under Review",
+            "ddqStatus": "Not Started",
+            "argReviewOwner": "dl77410",
+            "poSoeid": "DL77410",
+            "poName": "David Lim",
+            "aoStatus": "Pending"
+          }
+        }
+      ],
+      "summary": {
+        "region": "APAC",
+        "recordCount": 3,
+        "countryCount": 1,
+        "bankAccountCount": 3,
+        "accountStatuses": [
+          "Active",
+          "Suspended"
+        ],
+        "platforms": [
+          "Abacus",
+          "TLM"
+        ],
+        "databases": [
+          "ABACUS_PROD",
+          "TLM_PROD_APAC"
+        ],
+        "aoNames": [
+          "Ananya Sharma"
+        ],
+        "poNames": [
+          "David Lim"
+        ],
+        "reviewStatuses": [
+          "Approved",
+          "Under Review"
+        ],
+        "ddqStatuses": [
+          "Completed",
+          "Not Started"
+        ]
+      }
+    },
+    {
+      "groupId": "fk_000011",
+      "fullKey": "FK-2024-EMEA-0990",
+      "displayTitle": "FK-2024-EMEA-0990",
+      "records": [
+        {
+          "recordId": "rec_000023",
+          "central": {
+            "bankAccount": "BARC-FR-31200",
+            "accountStatus": "Active",
+            "accountType": "Nostro",
+            "region": "EMEA",
+            "country": "France",
+            "lineOfBusiness": "Equities",
+            "riskType": "Credit"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_EMEA",
+            "balancePool": "BP-EMEA-005",
+            "reconAccount": "TLM-EMEA-9901-A"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "PD55010"
+            },
+            "proofOwner": {
+              "soeid": "JH44201"
+            },
+            "argReviewOwner": {
+              "soeid": "jh44201"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-2290",
+              "name": "Pierre Dubois",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "JH44201",
+              "name": "James Harrington"
+            },
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed"
+          },
+          "usage": {
+            "bssAccountType": "External",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-EMEA-0990",
+            "bankAccount": "BARC-FR-31200",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_EMEA",
+            "reconBalancePool": "BP-EMEA-005",
+            "reconAccount": "TLM-EMEA-9901-A",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "PD55010",
+            "proofOwnerSoeid": "JH44201",
+            "bankAccountType": "Nostro",
+            "region": "EMEA",
+            "country": "France",
+            "aoSoeId": "AO-2290",
+            "aoName": "Pierre Dubois",
+            "lineOfBusiness": "Equities",
+            "bssAccountType": "External",
+            "bserReportable": "Yes",
+            "riskType": "Credit",
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed",
+            "argReviewOwner": "jh44201",
+            "poSoeid": "JH44201",
+            "poName": "James Harrington",
+            "aoStatus": "Active"
+          }
+        }
+      ],
+      "summary": {
+        "region": "EMEA",
+        "recordCount": 1,
+        "countryCount": 1,
+        "bankAccountCount": 1,
+        "accountStatuses": [
+          "Active"
+        ],
+        "platforms": [
+          "TLM"
+        ],
+        "databases": [
+          "TLM_PROD_EMEA"
+        ],
+        "aoNames": [
+          "Pierre Dubois"
+        ],
+        "poNames": [
+          "James Harrington"
+        ],
+        "reviewStatuses": [
+          "Approved"
+        ],
+        "ddqStatuses": [
+          "Completed"
+        ]
+      }
+    },
+    {
+      "groupId": "fk_000012",
+      "fullKey": "FK-2024-NAM-0620",
+      "displayTitle": "FK-2024-NAM-0620",
+      "records": [
+        {
+          "recordId": "rec_000024",
+          "central": {
+            "bankAccount": "CITI-US-81100",
+            "accountStatus": "Active",
+            "accountType": "Vostro",
+            "region": "NAM",
+            "country": "USA",
+            "lineOfBusiness": "Fixed Income",
+            "riskType": "Market"
+          },
+          "system": {
+            "platform": "TLM",
+            "database": "TLM_PROD_NAM",
+            "balancePool": "BP-NAM-003",
+            "reconAccount": "TLM-NAM-1120-A"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "JW99301"
+            },
+            "proofOwner": {
+              "soeid": "AT20014"
+            },
+            "argReviewOwner": {
+              "soeid": "at20014"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-1250",
+              "name": "Jonathan Wallace",
+              "status": "Pending"
+            },
+            "po": {
+              "soeid": "AT20014",
+              "name": "Angela Torres"
+            },
+            "reviewStatus": "Pending",
+            "ddqStatus": "In Progress"
+          },
+          "usage": {
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-NAM-0620",
+            "bankAccount": "CITI-US-81100",
+            "reconSystemPlatform": "TLM",
+            "reconSystemDatabase": "TLM_PROD_NAM",
+            "reconBalancePool": "BP-NAM-003",
+            "reconAccount": "TLM-NAM-1120-A",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "JW99301",
+            "proofOwnerSoeid": "AT20014",
+            "bankAccountType": "Vostro",
+            "region": "NAM",
+            "country": "USA",
+            "aoSoeId": "AO-1250",
+            "aoName": "Jonathan Wallace",
+            "lineOfBusiness": "Fixed Income",
+            "bssAccountType": "Internal",
+            "bserReportable": "Yes",
+            "riskType": "Market",
+            "reviewStatus": "Pending",
+            "ddqStatus": "In Progress",
+            "argReviewOwner": "at20014",
+            "poSoeid": "AT20014",
+            "poName": "Angela Torres",
+            "aoStatus": "Pending"
+          }
+        },
+        {
+          "recordId": "rec_000025",
+          "central": {
+            "bankAccount": "WELS-US-44201",
+            "accountStatus": "Active",
+            "accountType": "Current",
+            "region": "NAM",
+            "country": "USA",
+            "lineOfBusiness": "Fixed Income",
+            "riskType": "Liquidity"
+          },
+          "system": {
+            "platform": "Abacus",
+            "database": "ABACUS_PROD",
+            "balancePool": "BP-NAM-003",
+            "reconAccount": "ABA-US-44201"
+          },
+          "ownership": {
+            "accountOwner": {
+              "soeid": "JW99301"
+            },
+            "proofOwner": {
+              "soeid": "AT20014"
+            },
+            "argReviewOwner": {
+              "soeid": "at20014"
+            }
+          },
+          "approval": {
+            "ao": {
+              "soeid": "AO-1250",
+              "name": "Jonathan Wallace",
+              "status": "Active"
+            },
+            "po": {
+              "soeid": "AT20014",
+              "name": "Angela Torres"
+            },
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed"
+          },
+          "usage": {
+            "bssAccountType": "External",
+            "bserReportable": "Yes"
+          },
+          "raw": {
+            "fullKey": "FK-2024-NAM-0620",
+            "bankAccount": "WELS-US-44201",
+            "reconSystemPlatform": "Abacus",
+            "reconSystemDatabase": "ABACUS_PROD",
+            "reconBalancePool": "BP-NAM-003",
+            "reconAccount": "ABA-US-44201",
+            "accountStatus": "Active",
+            "accountOwnerSoeid": "JW99301",
+            "proofOwnerSoeid": "AT20014",
+            "bankAccountType": "Current",
+            "region": "NAM",
+            "country": "USA",
+            "aoSoeId": "AO-1250",
+            "aoName": "Jonathan Wallace",
+            "lineOfBusiness": "Fixed Income",
+            "bssAccountType": "External",
+            "bserReportable": "Yes",
+            "riskType": "Liquidity",
+            "reviewStatus": "Approved",
+            "ddqStatus": "Completed",
+            "argReviewOwner": "at20014",
+            "poSoeid": "AT20014",
+            "poName": "Angela Torres",
+            "aoStatus": "Active"
+          }
+        }
+      ],
+      "summary": {
+        "region": "NAM",
+        "recordCount": 2,
+        "countryCount": 1,
+        "bankAccountCount": 2,
+        "accountStatuses": [
+          "Active"
+        ],
+        "platforms": [
+          "TLM",
+          "Abacus"
+        ],
+        "databases": [
+          "TLM_PROD_NAM",
+          "ABACUS_PROD"
+        ],
+        "aoNames": [
+          "Jonathan Wallace"
+        ],
+        "poNames": [
+          "Angela Torres"
+        ],
+        "reviewStatuses": [
+          "Pending",
+          "Approved"
+        ],
+        "ddqStatuses": [
+          "In Progress",
+          "Completed"
+        ]
+      }
+    }
+  ]
+}

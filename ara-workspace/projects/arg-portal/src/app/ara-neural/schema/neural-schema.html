@@ -1,6 +1,6 @@
-<div class="ns-page">
+﻿<div class="ns-page">
 
-  <!-- ── Header ──────────────────────────────────────────────────────── -->
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
   <ara-page-header
     title="ARA Neural Schema"
     [breadcrumbs]="breadcrumbs"
@@ -17,7 +17,7 @@
     </div>
   </ara-page-header>
 
-  <!-- ── Subtitle bar ─────────────────────────────────────────────────── -->
+  <!-- ── Subtitle bar ─────────────────────────────────────────────────────── -->
   <div class="ns-subtitle-bar">
     <svg class="ns-subtitle-bar__icon" viewBox="0 0 20 20" fill="none">
       <circle cx="4"  cy="10" r="2.5" fill="#00C4B3" opacity=".9"/>
@@ -29,205 +29,288 @@
       <line x1="16" y1="10" x2="10" y2="15" stroke="#444" stroke-width="1.2"/>
     </svg>
     <span class="ns-subtitle-bar__text">
-      Trace lineage across Fullkey, account mappings, ownership and approval flow
+      Trace lineage across FULL_KEY groups, account mappings, ownership and approval flow
     </span>
-    <span class="ns-subtitle-bar__count">
-      {{ filteredRecords().length }} / {{ allRecords.length }} records
-    </span>
+    @if (!loading()) {
+      <span class="ns-subtitle-bar__count">
+        {{ filteredGroups().length }} groups &middot; {{ allGroups.length }} total
+      </span>
+    }
   </div>
 
-  <!-- ── Workspace (2-col: sidebar + canvas) ──────────────────────────── -->
-  <div class="ns-workspace">
+  <!-- ── Loading state ────────────────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="ns-status-overlay">
+      <span class="ns-loading-dot"></span>
+      Loading neural schema&hellip;
+    </div>
+  }
 
-    <!-- Left: Record List ──────────────────────────────────────────────── -->
-    <aside class="ns-sidebar">
-      <div class="ns-search">
-        <svg class="ns-search__icon" viewBox="0 0 16 16" fill="none">
-          <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        <input
-          class="ns-search__input"
-          type="text"
-          placeholder="Search records…"
-          [value]="searchQuery()"
-          (input)="onSearch($any($event.target).value)"
-        />
-        @if (searchQuery()) {
-          <button class="ns-search__clear" (click)="onSearch('')">✕</button>
-        }
-      </div>
+  <!-- ── Error state ──────────────────────────────────────────────────────── -->
+  @else if (loadError()) {
+    <div class="ns-status-overlay ns-status-overlay--error">
+      <svg viewBox="0 0 16 16" fill="none" style="width:16px;height:16px;flex-shrink:0">
+        <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M8 5v3.5M8 10v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      {{ loadError() }}
+    </div>
+  }
 
-      <div class="ns-sidebar__label">Lineage Records</div>
+  <!-- ── Main workspace ───────────────────────────────────────────────────── -->
+  @else {
+    <div class="ns-workspace">
 
-      <div class="ns-record-list">
-        @for (rec of filteredRecords(); track rec.id) {
-          <div
-            class="ns-record-item"
-            [class.ns-record-item--active]="selectedId() === rec.id"
-            (click)="select(rec.id)"
-          >
-            <div class="ns-record-item__top">
-              <span class="ns-record-item__key">{{ rec.fullkey }}</span>
-            </div>
-            <div class="ns-record-item__bottom">
-              <span class="ns-record-item__meta">{{ rec.region }} · {{ rec.country }}</span>
-              <span class="badge badge--xs" [class]="approvalClass(rec.approvalStatus)">
-                {{ rec.approvalStatus }}
-              </span>
-            </div>
-          </div>
-        }
-        @if (filteredRecords().length === 0) {
-          <div class="ns-empty">No records match your search.</div>
-        }
-      </div>
-    </aside>
+      <!-- ── Left sidebar: FULL_KEY group list ────────────────────────────── -->
+      <aside class="ns-sidebar">
 
-    <!-- Center: Neural Schema Canvas ──────────────────────────────────── -->
-    <main class="ns-canvas">
-      @if (selectedRecord(); as rec) {
-
-        <!-- Canvas header bar -->
-        <div class="ns-canvas__bar">
-          <div class="ns-canvas__bar-left">
-            <span class="ns-canvas__label-text">Neural Lineage</span>
-            <span class="ns-canvas__record-id">{{ rec.id }}</span>
-            <span class="badge badge--xs" [class]="mappingClass(rec.mappingStatus)">{{ rec.mappingStatus }}</span>
-            @if (revealStep() >= 0 && revealStep() < 4) {
-              <span class="ns-canvas__tracing">
-                <span class="ns-canvas__tracing-dot"></span>
-                Tracing lineage…
-              </span>
-            }
-          </div>
-          <button
-            class="btn btn--ghost btn--xs ns-canvas__detail-btn"
-            [class.ns-canvas__detail-btn--active]="detailOpen()"
-            (click)="toggleDetail()"
-          >
-            @if (detailOpen()) {
-              <svg viewBox="0 0 12 12" fill="none" style="width:11px;height:11px"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              Hide details
-            } @else {
-              <svg viewBox="0 0 12 12" fill="none" style="width:11px;height:11px"><rect x="1.5" y="1.5" width="9" height="9" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5v9" stroke="currentColor" stroke-width="1.4"/></svg>
-              Details
-            }
-          </button>
-        </div>
-
-        <!-- ─ Neural graph ─ -->
-        <div class="ns-graph" [class.ns-graph--tracing]="revealStep() >= 0 && revealStep() < 4">
-
-          <!-- SVG connector lines -->
-          <svg class="ns-graph__svg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <defs>
-              <marker id="arr-abacus"   markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="rgba(74,158,224,0.45)"/></marker>
-              <marker id="arr-tlm"      markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="rgba(139,92,246,0.45)"/></marker>
-              <marker id="arr-ao"       markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="rgba(245,166,35,0.45)"/></marker>
-              <marker id="arr-approver" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="rgba(34,197,94,0.45)"/></marker>
-            </defs>
-            <line class="ns-gline ns-gline--abacus"   [class.ns-gline--hidden]="revealStep() < 1" x1="50%" y1="42%" x2="50%" y2="18%" marker-end="url(#arr-abacus)"/>
-            <line class="ns-gline ns-gline--tlm"       [class.ns-gline--hidden]="revealStep() < 2" x1="59%" y1="50%" x2="81%" y2="50%" marker-end="url(#arr-tlm)"/>
-            <line class="ns-gline ns-gline--ao"        [class.ns-gline--hidden]="revealStep() < 3" x1="50%" y1="58%" x2="50%" y2="81%" marker-end="url(#arr-ao)"/>
-            <line class="ns-gline ns-gline--approver"  [class.ns-gline--hidden]="revealStep() < 4" x1="41%" y1="50%" x2="19%" y2="50%" marker-end="url(#arr-approver)"/>
+        <div class="ns-search">
+          <svg class="ns-search__icon" viewBox="0 0 16 16" fill="none">
+            <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
-
-          <!-- Center: Fullkey -->
-          <div class="ns-gnode ns-gnode--center ns-gnode--fullkey"
-               [class.ns-gnode--hidden]="revealStep() < 0"
-               (click)="openDetail('fullkey')">
-            <svg class="ns-gnode__icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <circle cx="7.5" cy="7.5" r="3.8" stroke="currentColor" stroke-width="1.4"/>
-              <path d="M10.5 10.5L16.5 16.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-            </svg>
-            <div class="ns-gnode__type">Fullkey</div>
-            <div class="ns-gnode__value">{{ rec.fullkey }}</div>
-            <div class="ns-gnode__sub">{{ rec.region }} · {{ rec.country }}</div>
-            <div class="ns-gnode__pulse"></div>
-          </div>
-
-          <!-- Top: Abacus Account -->
-          <div class="ns-gnode ns-gnode--pos-top ns-gnode--abacus"
-               [class.ns-gnode--hidden]="revealStep() < 1"
-               (click)="openDetail('abacus')">
-            <div class="ns-gnode__type">Abacus</div>
-            <div class="ns-gnode__value">{{ rec.abacusAccount }}</div>
-          </div>
-
-          <!-- Right: TLM Account -->
-          <div class="ns-gnode ns-gnode--pos-right ns-gnode--tlm"
-               [class.ns-gnode--hidden]="revealStep() < 2"
-               (click)="openDetail('tlm')">
-            <div class="ns-gnode__type">TLM</div>
-            <div class="ns-gnode__value">{{ rec.tlmAccount }}</div>
-          </div>
-
-          <!-- Bottom: AO Assigned -->
-          <div class="ns-gnode ns-gnode--pos-bottom ns-gnode--ao"
-               [class.ns-gnode--hidden]="revealStep() < 3"
-               (click)="openDetail('ao')">
-            <div class="ns-gnode__type">AO Assigned</div>
-            <div class="ns-gnode__value">{{ rec.aoName }}</div>
-          </div>
-
-          <!-- Left: ARG Approver -->
-          <div class="ns-gnode ns-gnode--pos-left ns-gnode--approver"
-               [class.ns-gnode--hidden]="revealStep() < 4"
-               (click)="openDetail('approver')">
-            <div class="ns-gnode__type">ARG Approver</div>
-            <div class="ns-gnode__value">{{ rec.argApprovedBy }}</div>
-          </div>
-
-        </div><!-- /ns-graph -->
-
-      } @else {
-        <div class="ns-canvas__empty">
-          <span>Select a record to view its lineage</span>
-        </div>
-      }
-    </main>
-
-    <!-- Detail Drawer (absolute overlay, right side) ────────────────── -->
-    @if (detailOpen() && selectedRecord(); as rec) {
-      <aside class="ns-drawer">
-        <div class="ns-drawer__header">
-          <span class="ns-drawer__title">Record Detail</span>
-          <span class="badge badge--xs" [class]="approvalClass(rec.approvalStatus)">{{ rec.approvalStatus }}</span>
-          <button class="ns-drawer__close btn btn--ghost btn--xs" (click)="toggleDetail()">✕</button>
-        </div>
-
-        <div class="ns-drawer__fields">
-          @for (field of detailFields(); track field.label) {
-            <div class="ns-drawer__field">
-              <span class="ns-drawer__field-label">{{ field.label }}</span>
-              @if (field.type === 'approval') {
-                <span class="badge badge--xs" [class]="approvalClass($any(field.value))">{{ field.value }}</span>
-              } @else if (field.type === 'mapping') {
-                <span class="badge badge--xs" [class]="mappingClass($any(field.value))">{{ field.value }}</span>
-              } @else {
-                <span class="ns-drawer__field-value">{{ field.value }}</span>
-              }
-            </div>
+          <input
+            class="ns-search__input"
+            type="text"
+            placeholder="Search FULL_KEY&hellip;"
+            [value]="searchQuery()"
+            (input)="onSearch($any($event.target).value)"
+          />
+          @if (searchQuery()) {
+            <button class="ns-search__clear" (click)="onSearch('')">&#x2715;</button>
           }
         </div>
 
-        <div class="ns-drawer__section-label">
-          <svg viewBox="0 0 12 12" fill="none" style="width:11px;height:11px;flex-shrink:0">
-            <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/>
-            <path d="M6 5v3.5M6 3.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-          </svg>
-          Audit Note
-        </div>
-        <p class="ns-drawer__comment">{{ rec.comments }}</p>
+        <div class="ns-sidebar__label">FULL_KEY Groups</div>
 
-        <div class="ns-drawer__actions">
-          <button class="btn btn--secondary btn--sm" style="flex:1">Edit Record</button>
-          <button class="btn btn--ghost btn--sm" style="flex:1">View History</button>
+        <div class="ns-record-list">
+          @for (group of filteredGroups(); track group.groupId) {
+            <div
+              class="ns-record-item"
+              [class.ns-record-item--active]="selectedGroupId() === group.groupId"
+              (click)="selectGroup(group.groupId)"
+            >
+              <div class="ns-record-item__top">
+                <span class="ns-record-item__key">{{ group.fullKey }}</span>
+              </div>
+              <div class="ns-record-item__bottom">
+                <span class="ns-record-item__meta">
+                  {{ group.summary.region }} &middot; {{ group.summary.recordCount }} rec
+                </span>
+                @if (group.summary.reviewStatuses.length > 0) {
+                  <span class="badge badge--xs"
+                        [class]="reviewClass(group.summary.reviewStatuses[0])">
+                    {{ group.summary.reviewStatuses[0] }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+          @if (filteredGroups().length === 0) {
+            <div class="ns-empty">No groups match your search.</div>
+          }
         </div>
-      </aside>
-    }
 
-  </div><!-- /ns-workspace -->
+      </aside><!-- /ns-sidebar -->
+
+      <!-- ── Center: Neural Schema Canvas ─────────────────────────────────── -->
+      <main class="ns-canvas">
+
+        @if (selectedGroup(); as group) {
+
+          <!-- Canvas header bar -->
+          <div class="ns-canvas__bar">
+            <div class="ns-canvas__bar-left">
+              <span class="ns-canvas__label-text">Neural Lineage</span>
+              <span class="ns-canvas__record-id">{{ group.groupId }}</span>
+              <span class="badge badge--xs badge--neutral">
+                {{ group.summary.recordCount }} record{{ group.summary.recordCount !== 1 ? 's' : '' }}
+              </span>
+              @if (revealStep() === 0) {
+                <span class="ns-canvas__tracing">
+                  <span class="ns-canvas__tracing-dot"></span>
+                  Tracing lineage&hellip;
+                </span>
+              }
+            </div>
+            <button
+              class="btn btn--ghost btn--xs ns-canvas__detail-btn"
+              [class.ns-canvas__detail-btn--active]="detailOpen()"
+              (click)="toggleDetail()"
+              [disabled]="!selectedRecord()"
+            >
+              @if (detailOpen()) {
+                <svg viewBox="0 0 12 12" fill="none" style="width:11px;height:11px">
+                  <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Hide details
+              } @else {
+                <svg viewBox="0 0 12 12" fill="none" style="width:11px;height:11px">
+                  <rect x="1.5" y="1.5" width="9" height="9" rx="1" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M8 1.5v9" stroke="currentColor" stroke-width="1.4"/>
+                </svg>
+                Details
+              }
+            </button>
+          </div><!-- /ns-canvas__bar -->
+
+          <!-- ─── Neural graph ──────────────────────────────────────────────── -->
+          <div class="ns-graph" [class.ns-graph--tracing]="revealStep() === 0">
+
+            <!-- Center node: FULL_KEY hub -->
+            <div class="ns-center-node" [class.ns-center-node--hidden]="revealStep() < 0">
+              <svg class="ns-center-node__icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <circle cx="7.5" cy="7.5" r="3.8" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M10.5 10.5L16.5 16.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              </svg>
+              <div class="ns-center-node__type">FULL_KEY</div>
+              <div class="ns-center-node__value">{{ group.fullKey }}</div>
+              <div class="ns-center-node__sub">
+                {{ group.summary.region }} &middot;
+                {{ group.summary.recordCount }} record{{ group.summary.recordCount !== 1 ? 's' : '' }} &middot;
+                {{ group.summary.countryCount }} countr{{ group.summary.countryCount !== 1 ? 'ies' : 'y' }}
+              </div>
+              <div class="ns-center-node__pulse"></div>
+            </div><!-- /ns-center-node -->
+
+            <!-- Trunk + branch area (animated at step >= 1) -->
+            @if (revealStep() >= 1) {
+              <div class="ns-trunk-area">
+
+                <!-- Vertical stem from center node down to branch rail -->
+                <div class="ns-trunk__line"></div>
+
+                <!-- Summary chips -->
+                <div class="ns-summary-chips">
+                  @for (platform of group.summary.platforms; track platform) {
+                    <span class="ns-chip">{{ platform }}</span>
+                  }
+                  @for (status of group.summary.accountStatuses; track status) {
+                    <span class="badge badge--xs" [class]="accountStatusClass(status)">{{ status }}</span>
+                  }
+                </div>
+
+                <!-- One branch column per record -->
+                <div class="ns-branches">
+                  @for (rec of group.records; track rec.recordId; let idx = $index) {
+                    <div
+                      class="ns-branch"
+                      [class.ns-branch--active]="selectedRecordId() === rec.recordId"
+                      (click)="selectRecord(rec.recordId)"
+                    >
+                      <!-- Arm from the horizontal rail down to first node -->
+                      <div class="ns-branch__arm"></div>
+
+                      <!-- Record index indicator -->
+                      <div class="ns-branch__index">Rec {{ idx + 1 }}</div>
+
+                      <!-- Bank Account node -->
+                      <div class="ns-bnode ns-bnode--bank">
+                        <div class="ns-bnode__type">Bank Account</div>
+                        <div class="ns-bnode__value">{{ rec.central.bankAccount }}</div>
+                        <div class="ns-bnode__sub">{{ rec.central.accountType }}</div>
+                        <span class="badge badge--xs"
+                              [class]="accountStatusClass(rec.central.accountStatus)">
+                          {{ rec.central.accountStatus }}
+                        </span>
+                      </div>
+
+                      <div class="ns-branch__connector"></div>
+
+                      <!-- Recon Account node -->
+                      <div class="ns-bnode ns-bnode--recon">
+                        <div class="ns-bnode__type">Recon Account</div>
+                        <div class="ns-bnode__value">{{ rec.system.reconAccount }}</div>
+                        <div class="ns-bnode__sub">{{ rec.system.platform }}</div>
+                      </div>
+
+                      <div class="ns-branch__connector"></div>
+
+                      <!-- Account Owner node -->
+                      <div class="ns-bnode ns-bnode--ao">
+                        <div class="ns-bnode__type">Account Owner</div>
+                        <div class="ns-bnode__value">{{ rec.approval.ao.name }}</div>
+                        <div class="ns-bnode__sub">{{ rec.approval.ao.soeid }}</div>
+                        @if (rec.approval.ao.status) {
+                          <span class="badge badge--xs"
+                                [class]="accountStatusClass(rec.approval.ao.status)">
+                            {{ rec.approval.ao.status }}
+                          </span>
+                        }
+                      </div>
+
+                      @if (rec.approval.po.name) {
+                        <div class="ns-branch__connector"></div>
+                        <!-- Proof Owner node -->
+                        <div class="ns-bnode ns-bnode--po">
+                          <div class="ns-bnode__type">Proof Owner</div>
+                          <div class="ns-bnode__value">{{ rec.approval.po.name }}</div>
+                          <div class="ns-bnode__sub">{{ rec.approval.po.soeid }}</div>
+                        </div>
+                      }
+
+                      @if (rec.approval.reviewStatus) {
+                        <div class="ns-branch__connector"></div>
+                        <!-- Review Status node -->
+                        <div class="ns-bnode ns-bnode--review">
+                          <div class="ns-bnode__type">Review</div>
+                          <div class="ns-bnode__value">{{ rec.approval.reviewStatus }}</div>
+                          <div class="ns-bnode__sub">DDQ: {{ rec.approval.ddqStatus }}</div>
+                        </div>
+                      }
+
+                    </div><!-- /ns-branch -->
+                  }
+                </div><!-- /ns-branches -->
+
+              </div><!-- /ns-trunk-area -->
+            }
+
+          </div><!-- /ns-graph -->
+
+        } @else {
+          <div class="ns-canvas__empty">
+            <span>Select a FULL_KEY group to view its neural lineage</span>
+          </div>
+        }
+
+      </main><!-- /ns-canvas -->
+
+      <!-- ── Detail Drawer (absolute overlay, right side) ──────────────────── -->
+      @if (detailOpen() && selectedRecord(); as rec) {
+        <aside class="ns-drawer">
+          <div class="ns-drawer__header">
+            <span class="ns-drawer__title">Record Detail</span>
+            <span class="badge badge--xs"
+                  [class]="reviewClass(rec.approval.reviewStatus)">
+              {{ rec.approval.reviewStatus }}
+            </span>
+            <button class="ns-drawer__close btn btn--ghost btn--xs"
+                    (click)="toggleDetail()">&#x2715;</button>
+          </div>
+
+          <div class="ns-drawer__fields">
+            @for (field of detailFields(); track field.label) {
+              <div class="ns-drawer__field">
+                <span class="ns-drawer__field-label">{{ field.label }}</span>
+                @if (field.type === 'review') {
+                  <span class="badge badge--xs"
+                        [class]="reviewClass(field.value)">{{ field.value }}</span>
+                } @else {
+                  <span class="ns-drawer__field-value">{{ field.value || '&mdash;' }}</span>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="ns-drawer__actions">
+            <button class="btn btn--secondary btn--sm" style="flex:1">Edit Record</button>
+            <button class="btn btn--ghost btn--sm"     style="flex:1">View History</button>
+          </div>
+        </aside>
+      }
+
+    </div><!-- /ns-workspace -->
+  }
 
 </div>
