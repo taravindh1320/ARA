@@ -1,0 +1,1264 @@
+<ara-page-header title="ARA Self Rec" [breadcrumbs]="breadcrumbs" />
+
+<!-- ── Subtitle bar ──────────────────────────────────────────────── -->
+<div class="sr-subtitle-bar">
+  <span class="sr-subtitle">Step-by-step self-service reconciliation builder</span>
+</div>
+
+<!-- ── Step bar ─────────────────────────────────────────────────── -->
+<div class="sr-steps">
+  @for (step of steps; track step.id; let last = $last) {
+    <button
+      class="sr-step"
+      [class.sr-step--active]="activeStep() === step.id"
+      [class.sr-step--done]="activeStep() > step.id"
+      [class.sr-step--locked]="!canGoTo(step.id)"
+      [disabled]="!canGoTo(step.id)"
+      (click)="goTo(step.id)"
+      [title]="canGoTo(step.id) ? step.label : 'Complete the current step to unlock'"
+    >
+      <span class="sr-step__num">
+        @if (activeStep() > step.id) {
+          <svg viewBox="0 0 16 16" fill="none">
+            <path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        } @else {
+          {{ step.id + 1 }}
+        }
+      </span>
+      <span class="sr-step__label">{{ step.label }}</span>
+    </button>
+    @if (!last) {
+      <span class="sr-step__connector" aria-hidden="true"></span>
+    }
+  }
+</div>
+
+<!-- ── Active step panel ─────────────────────────────────────────── -->
+<div class="sr-panel">
+  @for (step of steps; track step.id) {
+    @if (activeStep() === step.id) {
+      <div class="sr-card">
+        <div class="sr-card__header">
+          <span class="sr-card__num">{{ step.id + 1 }}</span>
+          <div>
+            <h2 class="sr-card__title">{{ step.label }}</h2>
+            <p class="sr-card__desc">{{ step.description }}</p>
+          </div>
+        </div>
+        <p class="sr-card__detail">{{ step.detail }}</p>
+
+        <div class="sr-card__body">
+
+          <!-- ── Step 0: Upload Files ─────────────────────────────── -->
+          @if (step.id === 0) {
+            <div class="sr-upload-row">
+
+              <!-- Source A -->
+              <div class="sr-upload-zone"
+                   [class.sr-upload-zone--drag]="dragOver() === 'A'"
+                   [class.sr-upload-zone--ready]="sourceA()?.status === 'ready'"
+                   [class.sr-upload-zone--error]="sourceA()?.status === 'error'"
+                   (dragover)="onDragOver($event, 'A')"
+                   (dragleave)="onDragLeave()"
+                   (drop)="onDrop($event, 'A')">
+
+                <div class="sr-upload-zone__label">
+                  <span class="sr-upload-zone__tag sr-upload-zone__tag--a">A</span>
+                  Source A
+                </div>
+
+                @if (!sourceA()) {
+                  <div class="sr-upload-zone__idle">
+                    <svg viewBox="0 0 32 32" fill="none" class="sr-upload-zone__icon">
+                      <path d="M16 22V10M10 16l6-6 6 6" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"/>
+                      <rect x="3" y="3" width="26" height="26" rx="5"
+                            stroke="currentColor" stroke-width="1.5" opacity=".3"/>
+                    </svg>
+                    <p class="sr-upload-zone__hint">Drop file here or</p>
+                    <label class="sr-btn sr-btn--ghost sr-upload-zone__browse">
+                      Browse
+                      <input type="file" accept=".csv,.xlsx,.xls" hidden
+                             (change)="onFileInputChange($event, 'A')">
+                    </label>
+                  </div>
+                }
+
+                @if (sourceA()?.status === 'uploading') {
+                  <div class="sr-upload-zone__uploading">
+                    <span class="sr-spinner"></span>
+                    <span>Uploading&hellip;</span>
+                  </div>
+                }
+
+                @if (sourceA()?.status === 'ready') {
+                  <div class="sr-file-info">
+                    <span class="sr-file-info__name">{{ sourceA()!.name }}</span>
+                    <span class="sr-file-info__size">{{ formatSize(sourceA()!.size) }}</span>
+                    <span class="sr-badge sr-badge--ok">Ready</span>
+                    <button class="sr-file-info__remove" title="Remove" (click)="removeFile('A')">&times;</button>
+                  </div>
+                  @if (sourceA()!.columns.length) {
+                    <div class="sr-preview">
+                      <table class="sr-preview__table">
+                        <thead>
+                          <tr>
+                            @for (col of previewColumns(sourceA()!); track col) {
+                              <th>{{ col }}</th>
+                            }
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (row of sourceA()!.preview; track $index) {
+                            <tr>
+                              @for (col of previewColumns(sourceA()!); track col; let i = $index) {
+                                <td>{{ row[i] }}</td>
+                              }
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  }
+                }
+
+                @if (sourceA()?.status === 'error') {
+                  <div class="sr-upload-zone__error">
+                    <span class="sr-badge sr-badge--err">Upload failed</span>
+                    <p class="sr-upload-zone__error-msg">{{ sourceA()!.error }}</p>
+                    <button class="sr-btn sr-btn--ghost sr-btn--sm" (click)="removeFile('A')">Try again</button>
+                  </div>
+                }
+
+              </div><!-- /Source A -->
+
+              <!-- Source B -->
+              <div class="sr-upload-zone"
+                   [class.sr-upload-zone--drag]="dragOver() === 'B'"
+                   [class.sr-upload-zone--ready]="sourceB()?.status === 'ready'"
+                   [class.sr-upload-zone--error]="sourceB()?.status === 'error'"
+                   (dragover)="onDragOver($event, 'B')"
+                   (dragleave)="onDragLeave()"
+                   (drop)="onDrop($event, 'B')">
+
+                <div class="sr-upload-zone__label">
+                  <span class="sr-upload-zone__tag sr-upload-zone__tag--b">B</span>
+                  Source B
+                </div>
+
+                @if (!sourceB()) {
+                  <div class="sr-upload-zone__idle">
+                    <svg viewBox="0 0 32 32" fill="none" class="sr-upload-zone__icon">
+                      <path d="M16 22V10M10 16l6-6 6 6" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"/>
+                      <rect x="3" y="3" width="26" height="26" rx="5"
+                            stroke="currentColor" stroke-width="1.5" opacity=".3"/>
+                    </svg>
+                    <p class="sr-upload-zone__hint">Drop file here or</p>
+                    <label class="sr-btn sr-btn--ghost sr-upload-zone__browse">
+                      Browse
+                      <input type="file" accept=".csv,.xlsx,.xls" hidden
+                             (change)="onFileInputChange($event, 'B')">
+                    </label>
+                  </div>
+                }
+
+                @if (sourceB()?.status === 'uploading') {
+                  <div class="sr-upload-zone__uploading">
+                    <span class="sr-spinner"></span>
+                    <span>Uploading&hellip;</span>
+                  </div>
+                }
+
+                @if (sourceB()?.status === 'ready') {
+                  <div class="sr-file-info">
+                    <span class="sr-file-info__name">{{ sourceB()!.name }}</span>
+                    <span class="sr-file-info__size">{{ formatSize(sourceB()!.size) }}</span>
+                    <span class="sr-badge sr-badge--ok">Ready</span>
+                    <button class="sr-file-info__remove" title="Remove" (click)="removeFile('B')">&times;</button>
+                  </div>
+                  @if (sourceB()!.columns.length) {
+                    <div class="sr-preview">
+                      <table class="sr-preview__table">
+                        <thead>
+                          <tr>
+                            @for (col of previewColumns(sourceB()!); track col) {
+                              <th>{{ col }}</th>
+                            }
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (row of sourceB()!.preview; track $index) {
+                            <tr>
+                              @for (col of previewColumns(sourceB()!); track col; let i = $index) {
+                                <td>{{ row[i] }}</td>
+                              }
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  }
+                }
+
+                @if (sourceB()?.status === 'error') {
+                  <div class="sr-upload-zone__error">
+                    <span class="sr-badge sr-badge--err">Upload failed</span>
+                    <p class="sr-upload-zone__error-msg">{{ sourceB()!.error }}</p>
+                    <button class="sr-btn sr-btn--ghost sr-btn--sm" (click)="removeFile('B')">Try again</button>
+                  </div>
+                }
+
+              </div><!-- /Source B -->
+
+            </div><!-- /sr-upload-row -->
+          }
+
+          <!-- ── Step 1: Create Map ─────────────────────────────── -->
+          @if (step.id === 1) {
+
+            <!-- loading / error states -->
+            @if (mappingLoading()) {
+              <div class="sr-mapping-loading">
+                <span class="sr-spinner"></span>
+                <span>Generating suggestions&hellip;</span>
+              </div>
+            }
+
+            @if (mappingError()) {
+              <div class="sr-mapping-err">
+                Could not load suggestions: {{ mappingError() }}
+              </div>
+            }
+
+            @if (!mappingLoading() && !mappingError() && mappingRows().length) {
+              <!-- column headers -->
+              <div class="sr-map-header">
+                <span class="sr-map-header__badge sr-map-header__badge--a">A</span>
+                <span class="sr-map-header__label">{{ sourceA()?.name }}</span>
+                <span class="sr-map-header__arrow" aria-hidden="true"></span>
+                <span class="sr-map-header__badge sr-map-header__badge--b">B</span>
+                <span class="sr-map-header__label">{{ sourceB()?.name }}</span>
+                <span class="sr-map-header__conf">Match</span>
+              </div>
+
+              <!-- mapping rows -->
+              <div class="sr-map-rows">
+                @for (row of mappingRows(); track row.sourceAField; let i = $index) {
+                  <div class="sr-map-row"
+                       [class.sr-map-row--high]="row.confidence === 'high'"
+                       [class.sr-map-row--low]="row.confidence === 'low'"
+                       [class.sr-map-row--none]="row.sourceBField === null">
+
+                    <!-- Source A field (fixed) -->
+                    <span class="sr-map-row__field sr-map-row__field--a">{{ row.sourceAField }}</span>
+
+                    <!-- arrow -->
+                    <svg class="sr-map-row__arrow" viewBox="0 0 24 12" fill="none">
+                      <line x1="0" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="1.4"/>
+                      <path d="M16 2l4 4-4 4" stroke="currentColor" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+
+                    <!-- Source B selector -->
+                    <select class="sr-map-row__select"
+                            [ngModel]="row.sourceBField ?? ''"
+                            (ngModelChange)="updateMappingTarget(i, $event)">
+                      <option value="">— not mapped —</option>
+                      @for (col of columnsB; track col) {
+                        <option [value]="col">{{ col }}</option>
+                      }
+                    </select>
+
+                    <!-- confidence badge -->
+                    <span class="sr-map-row__conf">
+                      @if (row.confidence === 'high') {
+                        <span class="sr-badge sr-badge--ok">Auto</span>
+                      } @else if (row.confidence === 'low') {
+                        <span class="sr-badge sr-badge--warn">Suggest</span>
+                      } @else if (row.sourceBField) {
+                        <span class="sr-badge sr-badge--manual">Manual</span>
+                      }
+                    </span>
+
+                  </div>
+                }
+              </div>
+
+              <!-- save bar -->
+              <div class="sr-map-save-bar">
+                <span class="sr-map-save-bar__info">
+                  {{ mappingRows().length }} fields from Source A &nbsp;·&nbsp;
+                  {{ mappingRows().length - mappingRows().filter(r => r.sourceBField === null).length }}
+                  mapped
+                </span>
+                <button class="sr-btn sr-btn--primary"
+                        [disabled]="mappingSaveStatus() === 'saving'"
+                        (click)="saveMapping()">
+                  @if (mappingSaveStatus() === 'saving') {
+                    <span class="sr-spinner sr-spinner--sm"></span>
+                    Saving&hellip;
+                  } @else if (mappingSaveStatus() === 'saved') {
+                    ✓ &nbsp; Saved
+                  } @else {
+                    Save Map
+                  }
+                </button>
+                @if (mappingSaveStatus() === 'saved' && mappingId()) {
+                  <span class="sr-map-save-bar__id">{{ mappingId() }}</span>
+                }
+                @if (mappingSaveStatus() === 'error') {
+                  <span class="sr-map-save-bar__err">Save failed.</span>
+                  <button class="sr-btn sr-btn--ghost sr-btn--sm" (click)="saveMapping()">Retry</button>
+                }
+              </div>
+            }
+          }
+
+          <!-- \u2500\u2500 Step 2: Create Pass \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 -->
+          @if (step.id === 2) {
+
+            @if (mappedFields.length === 0) {
+              <div class="sr-card__placeholder">
+                No mapped fields available. Go back and complete the mapping step first.
+              </div>
+            }
+
+            @if (mappedFields.length > 0) {
+
+              <!-- Pass tabs + save bar -->
+              <div class="pb-tabs-bar">
+                <div class="pb-tabs">
+                  @for (pass of passes(); track pass.id) {
+                    <button class="pb-tab" [class.pb-tab--active]="activePassId() === pass.id"
+                            (click)="setActivePass(pass.id)">
+                      <span class="pb-tab__num">{{ pass.order }}</span>
+                      <span class="pb-tab__name">{{ pass.name }}</span>
+                      <span class="pb-tab__type pb-tab__type--{{ pass.matchType }}">{{ pass.matchType }}</span>
+                      @if (passes().length > 1) {
+                        <button class="pb-tab__del" title="Remove pass"
+                                (click)="$event.stopPropagation(); removePass(pass.id)">&times;</button>
+                      }
+                    </button>
+                  }
+                  <button class="pb-tab pb-tab--new" (click)="addPass()">
+                    <svg viewBox="0 0 12 12" fill="none" width="10" height="10">
+                      <line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                      <line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                    New Pass
+                  </button>
+                </div>
+                <div class="pb-save">
+                  @if (passSaveStatus() === 'saved' && passSetId()) {
+                    <span class="pb-save__id">{{ passSetId() }}</span>
+                  }
+                  @if (passSaveStatus() === 'error') {
+                    <span class="pb-save__err">Save failed.</span>
+                    <button class="sr-btn sr-btn--ghost sr-btn--sm" (click)="savePasses()">Retry</button>
+                  }
+                  <button class="sr-btn sr-btn--primary sr-btn--sm"
+                          [disabled]="passSaveStatus() === 'saving'"
+                          (click)="savePasses()">
+                    @if (passSaveStatus() === 'saving') {
+                      <span class="sr-spinner sr-spinner--sm"></span>Saving&hellip;
+                    } @else if (passSaveStatus() === 'saved') {
+                      &#x2713;&nbsp;Saved
+                    } @else {
+                      Save Passes
+                    }
+                  </button>
+                </div>
+              </div><!-- /pb-tabs-bar -->
+
+              @if (activePass(); as pass) {
+
+                <!-- Config strip -->
+                <div class="pb-config">
+                  <div class="pb-config__field">
+                    <label class="pb-config__lbl">Name</label>
+                    <input class="pb-config__input" type="text"
+                           [ngModel]="pass.name"
+                           (ngModelChange)="updatePass(pass.id, { name: $event })">
+                  </div>
+                  <div class="pb-config__field">
+                    <label class="pb-config__lbl">Default operator</label>
+                    <div class="pb-type-pills">
+                      @for (t of matchTypes; track t.value) {
+                        <button class="pb-type-pill" [class.pb-type-pill--active]="pass.matchType === t.value"
+                                (click)="updatePass(pass.id, { matchType: t.value })">{{ t.label }}</button>
+                      }
+                    </div>
+                  </div>
+                  @if (pass.matchType === 'tolerance') {
+                    <div class="pb-config__field">
+                      <label class="pb-config__lbl">Tolerance</label>
+                      <div class="pb-tol-inputs">
+                        <input class="pb-tol-input" type="number" min="0" step="0.01" placeholder="abs"
+                               [ngModel]="pass.toleranceValue ?? 0"
+                               (ngModelChange)="updatePass(pass.id, { toleranceValue: +$event })">
+                        <span class="pb-tol-sep">|</span>
+                        <input class="pb-tol-input" type="number" min="0" step="0.1" placeholder="%"
+                               [ngModel]="pass.tolerancePercent ?? 0"
+                               (ngModelChange)="updatePass(pass.id, { tolerancePercent: +$event })">
+                        <span class="pb-tol-sep">%</span>
+                      </div>
+                    </div>
+                  }
+                  <label class="sr-toggle pb-config__toggle" title="Enable / disable this pass">
+                    <input type="checkbox" [ngModel]="pass.enabled"
+                           (ngModelChange)="updatePass(pass.id, { enabled: $event })">
+                    <span class="sr-toggle__track"></span>
+                  </label>
+                  <span class="pb-config__enabled-lbl">{{ pass.enabled ? 'Enabled' : 'Disabled' }}</span>
+                </div><!-- /pb-config -->
+
+                <!-- 3-panel workbench -->
+                <div class="pb-workbench">
+
+                  <!-- LEFT: Source A -->
+                  <div class="pb-panel pb-panel--a">
+                    <div class="pb-panel__head">
+                      <span class="pb-panel__src pb-panel__src--a">A</span>
+                      <span class="pb-panel__title">Source A</span>
+                      <label class="pb-panel__unmapped" title="Show only fields not yet in rules">
+                        <input type="checkbox" [ngModel]="showUnmappedOnly()"
+                               (ngModelChange)="showUnmappedOnly.set($event)">
+                        Unmapped
+                      </label>
+                    </div>
+                    <div class="pb-panel__search">
+                      <svg viewBox="0 0 16 16" fill="none" class="pb-panel__search-icon">
+                        <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="10" y1="10" x2="14" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                      <input type="text" class="pb-panel__search-input" placeholder="Search fields&hellip;"
+                             [ngModel]="fieldSearchA()" (ngModelChange)="fieldSearchA.set($event)">
+                      @if (fieldSearchA()) {
+                        <button class="pb-panel__search-clear" (click)="fieldSearchA.set('')">&times;</button>
+                      }
+                    </div>
+                    <div class="pb-panel__list">
+                      @if (groupedFieldsA().length === 0) {
+                        <p class="pb-panel__empty">No fields match.</p>
+                      }
+                      @for (grp of groupedFieldsA(); track grp.type) {
+                        <div class="pb-group">
+                          <span class="pb-group__label">{{ grp.label }}</span>
+                          @for (field of grp.fields; track field) {
+                            <button class="pb-field"
+                                    [class.pb-field--staged]="stagedFieldA() === field"
+                                    [class.pb-field--used]="isFieldUsedA(field)"
+                                    [title]="field"
+                                    (click)="selectFieldA(field)">
+                              <span class="pb-field__type pb-field__type--{{ classifyField(field) }}">{{ fieldTypeInitial(field) }}</span>
+                              <span class="pb-field__name">{{ field }}</span>
+                              @if (isFieldUsedA(field)) {
+                                <svg class="pb-field__check" viewBox="0 0 10 10" fill="none">
+                                  <path d="M2 5.5l2.5 2.5 3.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              } @else {
+                                <svg class="pb-field__arrow" viewBox="0 0 10 6" fill="none">
+                                  <path d="M1 3h7.5M6 1l2 2-2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              }
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div><!-- /pb-panel--a -->
+
+                  <!-- CENTER: Rules -->
+                  <div class="pb-center">
+                    <div class="pb-center__head">
+                      <span class="pb-center__title">Match Rules</span>
+                      <span class="pb-center__count">{{ pass.keys.length }}&nbsp;rule{{ pass.keys.length !== 1 ? 's' : '' }}</span>
+                      <button class="sr-btn sr-btn--ghost sr-btn--sm"
+                              [disabled]="pass.keys.length > 0"
+                              title="Auto-fill rules from all mapped fields"
+                              (click)="suggestRules()">Suggest All</button>
+                    </div>
+
+                    @if (stagedFieldA()) {
+                      <div class="pb-staged-hint">
+                        <span class="pb-staged-hint__field">{{ stagedFieldA() }}</span>
+                        <svg viewBox="0 0 20 8" fill="none" class="pb-staged-hint__arrow">
+                          <line x1="0" y1="4" x2="17" y2="4" stroke="currentColor" stroke-width="1.3"/>
+                          <path d="M14 1l3 3-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="pb-staged-hint__prompt">pick a Source B field</span>
+                        <button class="pb-staged-hint__cancel" (click)="stagedFieldA.set(null)">&times;</button>
+                      </div>
+                    }
+
+                    <div class="pb-rules">
+                      @if (pass.keys.length === 0) {
+                        <div class="pb-rules-empty">
+                          <svg viewBox="0 0 48 32" fill="none" class="pb-rules-empty__icon">
+                            <rect x="2" y="4"  width="44" height="8"  rx="3" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 3"/>
+                            <rect x="2" y="18" width="44" height="8"  rx="3" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 3"/>
+                          </svg>
+                          <p>No match rules yet.</p>
+                          <p class="pb-rules-empty__sub">Click a Source&nbsp;A field, then a Source&nbsp;B field to pair them &mdash; or use <em>Suggest All</em>.</p>
+                        </div>
+                      }
+                      @for (rule of pass.keys; track $index; let ri = $index) {
+                        <div class="pb-rule" [class.pb-rule--incomplete]="!rule.sourceAField || !rule.sourceBField">
+
+                          <!-- Reorder buttons -->
+                          <div class="pb-rule__order">
+                            <button class="pb-rule__move" [disabled]="ri === 0" (click)="moveRule(pass.id, ri, -1)">
+                              <svg viewBox="0 0 8 8" fill="none"><path d="M1 5.5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <button class="pb-rule__move" [disabled]="ri === pass.keys.length - 1" (click)="moveRule(pass.id, ri, 1)">
+                              <svg viewBox="0 0 8 8" fill="none"><path d="M1 2.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                          </div>
+
+                          <!-- Source A cell -->
+                          <div class="pb-rule__cell pb-rule__cell--a" [class.pb-rule__cell--empty]="!rule.sourceAField">
+                            @if (rule.sourceAField) {
+                              <span class="pb-field__type pb-field__type--{{ classifyField(rule.sourceAField) }}">{{ fieldTypeInitial(rule.sourceAField) }}</span>
+                              <span class="pb-rule__fname">{{ rule.sourceAField }}</span>
+                            } @else {
+                              <span class="pb-rule__empty-lbl">&larr; Source A</span>
+                            }
+                          </div>
+
+                          <!-- Operator select -->
+                          <select class="pb-rule__op"
+                                  [ngModel]="rule.operator ?? pass.matchType"
+                                  (ngModelChange)="updateRuleOperator(pass.id, ri, $event)">
+                            <option value="exact">= exact</option>
+                            <option value="tolerance">&#x2248; tol</option>
+                            <option value="manual">M manual</option>
+                          </select>
+
+                          <!-- Source B cell -->
+                          <div class="pb-rule__cell pb-rule__cell--b" [class.pb-rule__cell--empty]="!rule.sourceBField">
+                            @if (rule.sourceBField) {
+                              <span class="pb-field__type pb-field__type--{{ classifyField(rule.sourceBField) }}">{{ fieldTypeInitial(rule.sourceBField) }}</span>
+                              <span class="pb-rule__fname">{{ rule.sourceBField }}</span>
+                            } @else {
+                              <span class="pb-rule__empty-lbl">Source B &rarr;</span>
+                            }
+                          </div>
+
+                          <!-- Remove -->
+                          <button class="pb-rule__del" title="Remove rule" (click)="removeRule(pass.id, ri)">&times;</button>
+
+                        </div>
+                      }
+                    </div><!-- /pb-rules -->
+
+                    <div class="pb-center__foot">
+                      <button class="sr-btn sr-btn--ghost sr-btn--sm" (click)="addRule(pass.id)">
+                        <svg viewBox="0 0 12 12" fill="none" width="10" height="10">
+                          <line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                          <line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                        Add Blank Rule
+                      </button>
+                    </div>
+                  </div><!-- /pb-center -->
+
+                  <!-- RIGHT: Source B -->
+                  <div class="pb-panel pb-panel--b">
+                    <div class="pb-panel__head">
+                      <span class="pb-panel__src pb-panel__src--b">B</span>
+                      <span class="pb-panel__title">Source B</span>
+                    </div>
+                    <div class="pb-panel__search">
+                      <svg viewBox="0 0 16 16" fill="none" class="pb-panel__search-icon">
+                        <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="10" y1="10" x2="14" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                      <input type="text" class="pb-panel__search-input" placeholder="Search fields&hellip;"
+                             [ngModel]="fieldSearchB()" (ngModelChange)="fieldSearchB.set($event)">
+                      @if (fieldSearchB()) {
+                        <button class="pb-panel__search-clear" (click)="fieldSearchB.set('')">&times;</button>
+                      }
+                    </div>
+                    <div class="pb-panel__list">
+                      @if (groupedFieldsB().length === 0) {
+                        <p class="pb-panel__empty">No fields match.</p>
+                      }
+                      @for (grp of groupedFieldsB(); track grp.type) {
+                        <div class="pb-group pb-group--b">
+                          <span class="pb-group__label">{{ grp.label }}</span>
+                          @for (field of grp.fields; track field) {
+                            <button class="pb-field pb-field--b"
+                                    [class.pb-field--used]="isFieldUsedB(field)"
+                                    [class.pb-field--actionable]="!!stagedFieldA() && !isFieldUsedB(field)"
+                                    [title]="field"
+                                    (click)="selectFieldB(field)">
+                              @if (stagedFieldA() && !isFieldUsedB(field)) {
+                                <svg class="pb-field__arrow pb-field__arrow--b" viewBox="0 0 10 6" fill="none">
+                                  <path d="M1 3h7.5M6 1l2 2-2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              }
+                              <span class="pb-field__name">{{ field }}</span>
+                              <span class="pb-field__type pb-field__type--{{ classifyField(field) }}">{{ fieldTypeInitial(field) }}</span>
+                              @if (isFieldUsedB(field)) {
+                                <svg class="pb-field__check" viewBox="0 0 10 10" fill="none">
+                                  <path d="M2 5.5l2.5 2.5 3.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              }
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div><!-- /pb-panel--b -->
+
+                </div><!-- /pb-workbench -->
+
+              }<!-- /@if activePass -->
+
+            }<!-- /@if mappedFields -->
+
+          }
+
+          <!-- \u2500\u2500 Step 3: Create View \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 -->
+          @if (step.id === 3) {
+
+            @if (viewColumns().length === 0) {
+              <div class="sr-card__placeholder">
+                No field data available. Complete the previous steps first.
+              </div>
+            }
+
+            @if (viewColumns().length > 0) {
+
+              <!-- View name + save bar -->
+              <div class="vw-topbar">
+                <div class="vw-topbar__name-group">
+                  <label class="vw-lbl">View name</label>
+                  <input class="vw-name-input" type="text"
+                         [ngModel]="viewName()" (ngModelChange)="viewName.set($event)">
+                </div>
+                <div class="vw-topbar__save">
+                  @if (viewSaveStatus() === 'saved' && viewId()) {
+                    <span class="vw-save-id">{{ viewId() }}</span>
+                  }
+                  @if (viewSaveStatus() === 'error') {
+                    <span class="vw-save-err">Save failed.</span>
+                    <button class="sr-btn sr-btn--ghost sr-btn--sm" (click)="saveView()">Retry</button>
+                  }
+                  <button class="sr-btn sr-btn--primary sr-btn--sm"
+                          [disabled]="viewSaveStatus() === 'saving'"
+                          (click)="saveView()">
+                    @if (viewSaveStatus() === 'saving') {
+                      <span class="sr-spinner sr-spinner--sm"></span>Saving&hellip;
+                    } @else if (viewSaveStatus() === 'saved') {
+                      &#x2713;&nbsp;Saved
+                    } @else {
+                      Save View
+                    }
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3-section layout -->
+              <div class="vw-body">
+
+                <!-- ── LEFT: Result categories + Summary cards ── -->
+                <div class="vw-section">
+
+                  <!-- Summary cards -->
+                  <div class="vw-panel">
+                    <div class="vw-panel__head">
+                      <span class="vw-panel__icon">&#x25A1;</span>
+                      Summary Cards
+                    </div>
+                    <div class="vw-panel__body">
+                      @for (card of viewSummaryCards(); track card.id) {
+                        <label class="vw-check-row">
+                          <input type="checkbox" [ngModel]="card.visible"
+                                 (ngModelChange)="toggleSummaryCard(card.id)">
+                          <span class="vw-check-row__label">{{ card.label }}</span>
+                          <span class="vw-check-row__tip">{{ card.visible ? 'Visible' : 'Hidden' }}</span>
+                        </label>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Result categories -->
+                  <div class="vw-panel">
+                    <div class="vw-panel__head">
+                      <span class="vw-panel__icon">&#x2261;</span>
+                      Result Sections
+                    </div>
+                    <div class="vw-panel__body">
+                      @for (cat of viewCategories(); track cat.category) {
+                        <label class="vw-check-row">
+                          <input type="checkbox" [ngModel]="cat.visible"
+                                 (ngModelChange)="toggleCategoryVisible(cat.category)">
+                          <span class="vw-check-row__label">{{ cat.label }}</span>
+                          <span class="vw-check-row__badge vw-check-row__badge--{{ cat.category }}">
+                            {{ cat.category }}
+                          </span>
+                        </label>
+                      }
+                    </div>
+                  </div>
+
+                </div><!-- /vw-section (left) -->
+
+                <!-- ── CENTER: Column chooser ── -->
+                <div class="vw-section vw-section--wide">
+                  <div class="vw-panel vw-panel--fill">
+                    <div class="vw-panel__head">
+                      <span class="vw-panel__icon">&#x2630;</span>
+                      Result Columns
+                      <span class="vw-col-count">{{ visibleColumnCount() }} of {{ viewColumns().length }} visible</span>
+                      <button class="sr-btn sr-btn--ghost sr-btn--sm" style="margin-left:auto"
+                              (click)="setAllColumnsVisible(true)">All</button>
+                      <button class="sr-btn sr-btn--ghost sr-btn--sm"
+                              (click)="setAllColumnsVisible(false)">None</button>
+                    </div>
+                    <div class="vw-col-search-row">
+                      <svg viewBox="0 0 16 16" fill="none" class="vw-col-search-icon">
+                        <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                        <line x1="10" y1="10" x2="14" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                      <input type="text" class="vw-col-search-input" placeholder="Filter columns&hellip;"
+                             [ngModel]="viewColumnSearch()" (ngModelChange)="viewColumnSearch.set($event)">
+                      @if (viewColumnSearch()) {
+                        <button class="vw-col-search-clear" (click)="viewColumnSearch.set('')">&times;</button>
+                      }
+                    </div>
+                    <div class="vw-col-list">
+                      @if (filteredViewColumns().length === 0) {
+                        <p class="vw-col-empty">No columns match your search.</p>
+                      }
+                      @for (col of filteredViewColumns(); track col.field) {
+                        <div class="vw-col-row" [class.vw-col-row--hidden]="!col.visible">
+                          <label class="vw-col-row__toggle">
+                            <input type="checkbox" [ngModel]="col.visible"
+                                   (ngModelChange)="toggleColumnVisible(col.field)">
+                            <span class="vw-col-row__track"></span>
+                          </label>
+                          <span class="vw-col-row__src vw-col-row__src--{{ col.source }}">
+                            {{ col.source === 'both' ? '\u2194' : col.source }}
+                          </span>
+                          <span class="vw-col-row__name">{{ col.label ?? col.field }}</span>
+                          @if (col.source !== 'both') {
+                            <span class="vw-col-row__system">{{ col.field }}</span>
+                          }
+                          @if (col.source === 'both') {
+                            <span class="vw-col-row__computed">computed</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div><!-- /vw-section (center) -->
+
+                <!-- ── RIGHT: Sort + Group ── -->
+                <div class="vw-section">
+
+                  <!-- Sort -->
+                  <div class="vw-panel">
+                    <div class="vw-panel__head">
+                      <span class="vw-panel__icon">&#x21C5;</span>
+                      Default Sort
+                    </div>
+                    <div class="vw-panel__body vw-panel__body--form">
+                      <label class="vw-lbl">Sort by</label>
+                      <select class="vw-select"
+                              [ngModel]="viewSort()?.field ?? ''"
+                              (ngModelChange)="setViewSort($event, viewSort()?.direction ?? 'asc')">
+                        <option value="">— None —</option>
+                        @for (col of viewColumns(); track col.field) {
+                          @if (col.visible) {
+                            <option [value]="col.field">{{ col.label ?? col.field }}</option>
+                          }
+                        }
+                      </select>
+                      @if (viewSort()?.field) {
+                        <label class="vw-lbl" style="margin-top:0.5rem">Direction</label>
+                        <div class="vw-dir-pills">
+                          <button class="vw-dir-pill" [class.vw-dir-pill--active]="viewSort()?.direction === 'asc'"
+                                  (click)="setViewSort(viewSort()!.field, 'asc')">&#x2191; Asc</button>
+                          <button class="vw-dir-pill" [class.vw-dir-pill--active]="viewSort()?.direction === 'desc'"
+                                  (click)="setViewSort(viewSort()!.field, 'desc')">&#x2193; Desc</button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Group by -->
+                  <div class="vw-panel">
+                    <div class="vw-panel__head">
+                      <span class="vw-panel__icon">&#x29C7;</span>
+                      Group By
+                    </div>
+                    <div class="vw-panel__body vw-panel__body--form">
+                      <label class="vw-lbl">Group by</label>
+                      <select class="vw-select"
+                              [ngModel]="viewGroupBy()?.field ?? ''"
+                              (ngModelChange)="setViewGroupBy($event)">
+                        <option value="">— None —</option>
+                        @for (col of viewColumns(); track col.field) {
+                          @if (col.visible) {
+                            <option [value]="col.field">{{ col.label ?? col.field }}</option>
+                          }
+                        }
+                      </select>
+                      @if (viewGroupBy()?.field) {
+                        <label class="vw-check-row" style="margin-top:0.5rem">
+                          <input type="checkbox" [ngModel]="viewGroupBy()!.showSubtotals"
+                                 (ngModelChange)="toggleGroupSubtotals()">
+                          <span class="vw-check-row__label">Show subtotals per group</span>
+                        </label>
+                      }
+                    </div>
+                  </div>
+
+                </div><!-- /vw-section (right) -->
+
+              </div><!-- /vw-body -->
+
+            }<!-- /@if viewColumns -->
+
+          }<!-- /@if step 3 -->
+
+          <!-- \u2500\u2500 Step 4: Placeholder \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 -->
+          @if (step.id === 4) {
+            <!-- ── Run Recon ───────────────────────────────────────────────── -->
+            <div class="rr-layout">
+
+              <!-- Review Summary -->
+              <div class="rr-review">
+                <div class="rr-section-label">Review Summary</div>
+                <div class="rr-review__cards">
+
+                  <!-- Source Files -->
+                  <div class="rr-review-card">
+                    <div class="rr-review-card__title">Source Files</div>
+                    <div class="rr-review-card__row">
+                      <span class="rr-review-card__badge rr-review-card__badge--a">A</span>
+                      <span class="rr-review-card__value">{{ sourceA()?.name ?? '—' }}</span>
+                    </div>
+                    <div class="rr-review-card__row">
+                      <span class="rr-review-card__badge rr-review-card__badge--b">B</span>
+                      <span class="rr-review-card__value">{{ sourceB()?.name ?? '—' }}</span>
+                    </div>
+                    <div class="rr-review-card__meta">
+                      {{ sourceA()?.columns?.length ?? 0 }} cols A &nbsp;·&nbsp; {{ sourceB()?.columns?.length ?? 0 }} cols B
+                    </div>
+                  </div>
+
+                  <!-- Mapping -->
+                  <div class="rr-review-card">
+                    <div class="rr-review-card__title">Mapping</div>
+                    <div class="rr-review-card__stat">{{ mappedFields.length }}</div>
+                    <div class="rr-review-card__stat-label">field pairs mapped</div>
+                    @if (mappingId()) {
+                      <div class="rr-review-card__id">{{ mappingId() }}</div>
+                    }
+                  </div>
+
+                  <!-- Passes -->
+                  <div class="rr-review-card">
+                    <div class="rr-review-card__title">Passes</div>
+                    <div class="rr-review-card__stat">{{ passes().length }}</div>
+                    <div class="rr-review-card__stat-label">passes configured</div>
+                    @if (passSetId()) {
+                      <div class="rr-review-card__id">{{ passSetId() }}</div>
+                    }
+                    @for (p of passes(); track p.id) {
+                      <div class="rr-review-card__pass-name">{{ p.name }}</div>
+                    }
+                  </div>
+
+                  <!-- View -->
+                  <div class="rr-review-card">
+                    <div class="rr-review-card__title">Result View</div>
+                    <div class="rr-review-card__value rr-review-card__value--name">{{ viewName() }}</div>
+                    <div class="rr-review-card__meta">
+                      {{ visibleColumnCount() }} of {{ viewColumns().length }} columns visible
+                    </div>
+                    @if (viewId()) {
+                      <div class="rr-review-card__id">{{ viewId() }}</div>
+                    }
+                  </div>
+
+                </div>
+              </div><!-- /rr-review -->
+
+              <!-- Run Configuration -->
+              <div class="rr-config">
+                <div class="rr-config__row">
+
+                  <div class="rr-config__field">
+                    <span class="rr-config__label">Run Mode</span>
+                    <div class="rr-config__pills">
+                      <button class="rr-pill"
+                              [class.rr-pill--active]="runMode() === 'preview'"
+                              [disabled]="runStatus() === 'running'"
+                              (click)="runMode.set('preview')">Preview</button>
+                      <button class="rr-pill"
+                              [class.rr-pill--active]="runMode() === 'execute'"
+                              [disabled]="runStatus() === 'running'"
+                              (click)="runMode.set('execute')">Execute</button>
+                    </div>
+                    <span class="rr-config__hint">
+                      @if (runMode() === 'preview') {
+                        Runs the match logic without committing any output.
+                      } @else {
+                        Commits results and generates the final reconciliation report.
+                      }
+                    </span>
+                  </div>
+
+                  <div class="rr-config__field">
+                    <label class="rr-config__label" for="rr-submitted-by">Submitted By</label>
+                    <input id="rr-submitted-by"
+                           class="rr-config__input"
+                           type="text"
+                           placeholder="your name or team"
+                           [ngModel]="submittedBy()"
+                           (ngModelChange)="submittedBy.set($event)"
+                           [disabled]="runStatus() === 'running'" />
+                  </div>
+
+                  <div class="rr-config__run-btn-wrap">
+                    <button class="rr-run-btn"
+                            [class.rr-run-btn--execute]="runMode() === 'execute'"
+                            [disabled]="runStatus() === 'running'"
+                            (click)="runRecon()">
+                      @if (runStatus() === 'running') {
+                        <span class="rr-spinner"></span>
+                        Running&hellip;
+                      } @else {
+                        <svg viewBox="0 0 16 16" fill="none" width="16" height="16">
+                          <path d="M4 3l10 5-10 5V3z" fill="currentColor"/>
+                        </svg>
+                        {{ runStatus() === 'complete' || runStatus() === 'error' ? 'Re-run Recon' : 'Run Recon' }}
+                      }
+                    </button>
+                  </div>
+
+                </div>
+              </div><!-- /rr-config -->
+
+              <!-- Running state -->
+              @if (runStatus() === 'running') {
+                <div class="rr-status rr-status--running">
+                  <span class="rr-spinner rr-spinner--lg"></span>
+                  <div class="rr-status__text">
+                    <span class="rr-status__label">Processing reconciliation&hellip;</span>
+                    <span class="rr-status__sub">This may take a few moments.</span>
+                  </div>
+                </div>
+              }
+
+              <!-- Complete state -->
+              @if (runStatus() === 'complete') {
+                <div class="rr-results">
+
+                  <!-- ── Header ── -->
+                  <div class="rr-results__header">
+                    <svg class="rr-results__check" viewBox="0 0 20 20" fill="none" width="20" height="20">
+                      <circle cx="10" cy="10" r="9" stroke="var(--teal-400,#2dd4bf)" stroke-width="1.5"/>
+                      <path d="M6 10l3 3 5-5" stroke="var(--teal-400,#2dd4bf)" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="rr-results__title">Reconciliation Complete</span>
+                    <span class="rr-results__run-id">{{ runId() }}</span>
+                    @if (runMessage()) {
+                      <span class="rr-results__message">{{ runMessage() }}</span>
+                    }
+                  </div>
+
+                  <!-- ── KPI summary cards ── -->
+                  @if (runSummary(); as s) {
+                    <div class="rr-kpis">
+                      <div class="rr-kpi">
+                        <span class="rr-kpi__value rr-kpi__value--muted">{{ (s.totalA + s.totalB) | number }}</span>
+                        <span class="rr-kpi__label">Total Records</span>
+                      </div>
+                      <div class="rr-kpi rr-kpi--rate">
+                        <span class="rr-kpi__value">{{ s.matchRate | number:'1.1-1' }}%</span>
+                        <span class="rr-kpi__label">Match Rate</span>
+                      </div>
+                      <div class="rr-kpi">
+                        <span class="rr-kpi__value rr-kpi__value--green">{{ s.matched | number }}</span>
+                        <span class="rr-kpi__label">Matched</span>
+                      </div>
+                      <div class="rr-kpi">
+                        <span class="rr-kpi__value rr-kpi__value--amber">{{ s.unmatched | number }}</span>
+                        <span class="rr-kpi__label">Unmatched</span>
+                      </div>
+                      <div class="rr-kpi">
+                        <span class="rr-kpi__value rr-kpi__value--red">{{ s.breaks | number }}</span>
+                        <span class="rr-kpi__label">Breaks</span>
+                      </div>
+                      <div class="rr-kpi">
+                        <span class="rr-kpi__value rr-kpi__value--muted">{{ s.exceptions | number }}</span>
+                        <span class="rr-kpi__label">Exceptions</span>
+                      </div>
+                    </div>
+                    <div class="rr-results__row-info">
+                      {{ s.totalA | number }} rows in Source A &nbsp;·&nbsp; {{ s.totalB | number }} rows in Source B
+                    </div>
+                  }
+
+                  <!-- ── Result tabs ── -->
+                  <div class="rr-tabs">
+                    <button class="rr-tab" [class.rr-tab--active]="resultTab() === 'matched'"
+                            (click)="resultTab.set('matched')">
+                      Matched
+                      <span class="rr-tab__badge rr-tab__badge--green">{{ matchedRows().length }}</span>
+                    </button>
+                    <button class="rr-tab" [class.rr-tab--active]="resultTab() === 'breaks'"
+                            (click)="resultTab.set('breaks')">
+                      Breaks &amp; Unmatched
+                      <span class="rr-tab__badge rr-tab__badge--red">{{ breakRows().length }}</span>
+                    </button>
+                    <button class="rr-tab" [class.rr-tab--active]="resultTab() === 'exceptions'"
+                            (click)="resultTab.set('exceptions')">
+                      Exceptions
+                      <span class="rr-tab__badge rr-tab__badge--amber">{{ exceptionRows().length }}</span>
+                    </button>
+                    <button class="rr-tab" [class.rr-tab--active]="resultTab() === 'analyzer'"
+                            (click)="resultTab.set('analyzer')">
+                      <svg viewBox="0 0 16 16" fill="none" width="13" height="13" style="margin-right:4px">
+                        <rect x="1" y="9" width="2" height="6" rx="1" fill="currentColor"/>
+                        <rect x="5" y="5" width="2" height="10" rx="1" fill="currentColor"/>
+                        <rect x="9" y="2" width="2" height="13" rx="1" fill="currentColor"/>
+                        <rect x="13" y="6" width="2" height="9" rx="1" fill="currentColor"/>
+                      </svg>
+                      Analyzer Report
+                    </button>
+                  </div>
+
+                  <!-- ── Loading state ── -->
+                  @if (resultsLoading()) {
+                    <div class="rr-grid-status rr-grid-status--loading">
+                      <span class="rr-spinner rr-spinner--lg"></span>
+                      <span>Loading results&hellip;</span>
+                    </div>
+                  }
+
+                  <!-- ── Error state ── -->
+                  @if (resultsError()) {
+                    <div class="rr-grid-status rr-grid-status--error">
+                      <svg viewBox="0 0 16 16" fill="none" width="16" height="16">
+                        <circle cx="8" cy="8" r="7" stroke="#f87171" stroke-width="1.4"/>
+                        <path d="M8 5v3.5M8 10.5v.5" stroke="#f87171" stroke-width="1.6" stroke-linecap="round"/>
+                      </svg>
+                      {{ resultsError() }}
+                      <button class="sr-btn sr-btn--ghost" style="margin-left:auto" (click)="fetchResults()">Retry</button>
+                    </div>
+                  }
+
+                  <!-- ── Matched grid ── -->
+                  @if (!resultsLoading() && !resultsError() && resultTab() === 'matched') {
+                    @if (matchedRows().length > 0) {
+                      <ag-grid-angular
+                        class="rr-grid"
+                        [theme]="theme"
+                        [rowData]="matchedRows()"
+                        [columnDefs]="resultColDefs"
+                        [defaultColDef]="resultDefaultColDef">
+                      </ag-grid-angular>
+                    } @else {
+                      <div class="rr-grid-empty">No matched records in the current sample.</div>
+                    }
+                  }
+
+                  <!-- ── Breaks & Unmatched grid ── -->
+                  @if (!resultsLoading() && !resultsError() && resultTab() === 'breaks') {
+                    @if (breakRows().length > 0) {
+                      <ag-grid-angular
+                        class="rr-grid"
+                        [theme]="theme"
+                        [rowData]="breakRows()"
+                        [columnDefs]="resultColDefs"
+                        [defaultColDef]="resultDefaultColDef">
+                      </ag-grid-angular>
+                    } @else {
+                      <div class="rr-grid-empty">No breaks or unmatched records.</div>
+                    }
+                  }
+
+                  <!-- ── Exceptions grid ── -->
+                  @if (!resultsLoading() && !resultsError() && resultTab() === 'exceptions') {
+                    @if (exceptionRows().length > 0) {
+                      <ag-grid-angular
+                        class="rr-grid"
+                        [theme]="theme"
+                        [rowData]="exceptionRows()"
+                        [columnDefs]="resultColDefs"
+                        [defaultColDef]="resultDefaultColDef">
+                      </ag-grid-angular>
+                    } @else {
+                      <div class="rr-grid-empty">No exceptions raised.</div>
+                    }
+                  }
+
+                  <!-- ── Analyzer Report ── -->
+                  @if (!resultsLoading() && !resultsError() && resultTab() === 'analyzer') {
+                    @if (analyzerData(); as report) {
+                      <div class="rr-analyzer">
+
+                        <!-- Narrative -->
+                        <div class="rr-analyzer__narrative">{{ report.narrative }}</div>
+
+                        <!-- Three panels side by side -->
+                        <div class="rr-analyzer__panels">
+
+                          <!-- Match by Pass -->
+                          <div class="rr-analyzer__panel">
+                            <div class="rr-analyzer__panel-title">Match Count by Pass</div>
+                            <table class="rr-ana-table">
+                              <thead>
+                                <tr><th>Pass</th><th>Matched</th><th>Share</th></tr>
+                              </thead>
+                              <tbody>
+                                @for (row of report.matchByPass; track row.passName) {
+                                  <tr>
+                                    <td>{{ row.passName }}</td>
+                                    <td>{{ row.count | number }}</td>
+                                    <td>
+                                      <div class="rr-bar-row">
+                                        <div class="rr-bar rr-bar--green" [style.width.%]="row.percentage"></div>
+                                        <span>{{ row.percentage }}%</span>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- Top Break Reasons -->
+                          <div class="rr-analyzer__panel">
+                            <div class="rr-analyzer__panel-title">Top Break Reasons</div>
+                            <table class="rr-ana-table">
+                              <thead>
+                                <tr><th>Reason</th><th>Count</th><th>Share</th></tr>
+                              </thead>
+                              <tbody>
+                                @for (row of report.topBreakReasons; track row.reason) {
+                                  <tr>
+                                    <td>{{ row.reason }}</td>
+                                    <td>{{ row.count | number }}</td>
+                                    <td>
+                                      <div class="rr-bar-row">
+                                        <div class="rr-bar rr-bar--red" [style.width.%]="row.percentage"></div>
+                                        <span>{{ row.percentage }}%</span>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- Exception Distribution -->
+                          <div class="rr-analyzer__panel">
+                            <div class="rr-analyzer__panel-title">Exception Distribution</div>
+                            <table class="rr-ana-table">
+                              <thead>
+                                <tr><th>Type</th><th>Count</th></tr>
+                              </thead>
+                              <tbody>
+                                @for (row of report.exceptionDistribution; track row.type) {
+                                  <tr>
+                                    <td>{{ row.type }}</td>
+                                    <td>{{ row.count | number }}</td>
+                                  </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+
+                        </div><!-- /rr-analyzer__panels -->
+                      </div><!-- /rr-analyzer -->
+                    } @else {
+                      <div class="rr-grid-empty">Analyzer data is not yet available.</div>
+                    }
+                  }
+
+                  <!-- Sample note -->
+                  @if (sampleNote()) {
+                    <div class="rr-sample-note">
+                      <svg viewBox="0 0 16 16" fill="none" width="13" height="13">
+                        <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.4"/>
+                        <path d="M8 7v4M8 5v.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                      </svg>
+                      {{ sampleNote() }}
+                    </div>
+                  }
+
+                </div><!-- /rr-results -->
+              }
+
+              <!-- Error state -->
+              @if (runStatus() === 'error') {
+                <div class="rr-status rr-status--error">
+                  <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+                    <circle cx="10" cy="10" r="9" stroke="#f87171" stroke-width="1.5"/>
+                    <path d="M10 6v4.5M10 13.5v.5" stroke="#f87171" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                  <div class="rr-status__text">
+                    <span class="rr-status__label">{{ runError() }}</span>
+                  </div>
+                  <button class="sr-btn sr-btn--ghost rr-retry-btn" (click)="runRecon()">Retry</button>
+                </div>
+              }
+
+            </div><!-- /rr-layout -->
+          }
+
+
+        </div><!-- /sr-card__body -->
+      </div>
+    }
+  }
+</div>
+
+<!-- ── Navigation ────────────────────────────────────────────────── -->
+<div class="sr-nav">
+  <button class="sr-btn sr-btn--ghost" [disabled]="isFirst()" (click)="back()">
+    <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+      <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Back
+  </button>
+
+  <span class="sr-nav__center">
+    <span class="sr-nav__progress">Step {{ activeStep() + 1 }} of {{ steps.length }} &mdash; {{ steps[activeStep()].label }}</span>
+    @if (nextHint()) {
+      <span class="sr-nav__hint">{{ nextHint() }}</span>
+    }
+  </span>
+
+  @if (isLast()) {
+    <button class="sr-btn sr-btn--ghost" (click)="goTo(0)">
+      <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+        <path d="M2 8a6 6 0 1 0 6-6" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M2 4v4h4" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Start Over
+    </button>
+  } @else {
+    <button class="sr-btn sr-btn--primary" [disabled]="!canNext()" (click)="next()">
+      Next
+      <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
+        <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  }
+</div>

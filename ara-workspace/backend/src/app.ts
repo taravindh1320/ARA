@@ -1,6 +1,7 @@
 import express     from 'express';
 import cors        from 'cors';
-import neuralRoutes from './routes/neural.routes';
+import neuralRoutes   from './routes/neural.routes';
+import selfRecRoutes  from './routes/self-rec.routes';
 import { config }  from './config';
 
 const app = express();
@@ -22,7 +23,8 @@ app.get('/health', (_req, res) => {
 });
 
 // ── API routes ────────────────────────────────────────────────────────────────
-app.use('/api/ara-neural', neuralRoutes);
+app.use('/api/ara-neural',   neuralRoutes);
+app.use('/api/ara-self-rec', selfRecRoutes);
 
 // ── 404 fallback ─────────────────────────────────────────────────────────────
 app.use((_req, res) => {

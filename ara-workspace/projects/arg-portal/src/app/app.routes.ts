@@ -14,6 +14,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./ara-neural/schema/neural-schema').then(m => m.NeuralSchemaComponent)
       },
+      {
+        path: 'ara-neural/self-rec',
+        loadComponent: () =>
+          import('./ara-neural/self-rec/self-rec').then(m => m.SelfRecComponent)
+      },
 
       // ── ARG ──────────────────────────────────────────────────────────
       {

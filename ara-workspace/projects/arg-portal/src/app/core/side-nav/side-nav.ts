@@ -30,7 +30,8 @@ export class SideNavComponent {
 
   // ── ARA Neural ───────────────────────────────────────────────────
   readonly neuralItems: NavLink[] = [
-    { label: 'Neural Schema', route: '/ara-neural/schema' }
+    { label: 'Neural Schema', route: '/ara-neural/schema' },
+    { label: 'ARA Self Rec',  route: '/ara-neural/self-rec' }
   ];
 
   // ── ARG ──────────────────────────────────────────────────────────
