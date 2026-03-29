@@ -176,109 +176,160 @@
             </button>
           </div><!-- /ns-canvas__bar -->
 
-          <!-- ─── Neural graph ──────────────────────────────────────────────── -->
+          <!-- ─── Radial neural graph ──────────────────────────────────────── -->
           <div class="ns-graph" [class.ns-graph--tracing]="revealStep() === 0">
 
-            <!-- Center node: FULL_KEY hub -->
-            <div class="ns-center-node" [class.ns-center-node--hidden]="revealStep() < 0">
-              <svg class="ns-center-node__icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <circle cx="7.5" cy="7.5" r="3.8" stroke="currentColor" stroke-width="1.4"/>
-                <path d="M10.5 10.5L16.5 16.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-              <div class="ns-center-node__type">FULL_KEY</div>
-              <div class="ns-center-node__value">{{ group.fullKey }}</div>
-              <div class="ns-center-node__sub">
-                {{ group.summary.region }} &middot;
-                {{ group.summary.recordCount }} record{{ group.summary.recordCount !== 1 ? 's' : '' }} &middot;
-                {{ group.summary.countryCount }} countr{{ group.summary.countryCount !== 1 ? 'ies' : 'y' }}
-              </div>
-              <div class="ns-center-node__pulse"></div>
-            </div><!-- /ns-center-node -->
-
-            <!-- Trunk + branch area (animated at step >= 1) -->
+            <!-- SVG connector layer — drawn behind all cluster panels -->
             @if (revealStep() >= 1) {
-              <div class="ns-trunk-area">
+              <svg class="ns-graph__svg" aria-hidden="true">
+                <!-- top-left connector: center → bank accounts -->
+                <line class="ns-svg-line ns-svg-line--bank"
+                      x1="50%" y1="50%" x2="23%" y2="28%"/>
+                <!-- top-right connector: center → recon accounts -->
+                <line class="ns-svg-line ns-svg-line--recon"
+                      x1="50%" y1="50%" x2="77%" y2="28%"/>
+                <!-- bottom-left connector: center → ownership -->
+                <line class="ns-svg-line ns-svg-line--ao"
+                      x1="50%" y1="50%" x2="23%" y2="72%"/>
+                <!-- bottom-right connector: center → approval -->
+                <line class="ns-svg-line ns-svg-line--review"
+                      x1="50%" y1="50%" x2="77%" y2="72%"/>
+              </svg>
+            }
 
-                <div class="ns-trunk__line"></div>
-
-                <div class="ns-summary-chips">
-                  @for (platform of group.summary.platforms; track platform) {
-                    <span class="ns-chip">{{ platform }}</span>
-                  }
-                  @for (status of group.summary.accountStatuses; track status) {
-                    <span class="badge badge--xs" [class]="accountStatusClass(status)">{{ status }}</span>
+            <!-- ── CENTER HUB ─────────────────────────────────────────────── -->
+            <div class="ns-hub" [class.ns-hub--hidden]="revealStep() < 0">
+              <div class="ns-hub__pulse"></div>
+              <div class="ns-hub__ring"></div>
+              <div class="ns-hub__body">
+                <div class="ns-hub__label">FULL_KEY</div>
+                <div class="ns-hub__value">{{ group.fullKey }}</div>
+                <div class="ns-hub__meta">
+                  {{ group.summary.region }}
+                  &nbsp;&middot;&nbsp;
+                  {{ group.summary.recordCount }} rec
+                  &nbsp;&middot;&nbsp;
+                  {{ group.summary.countryCount }} countr{{ group.summary.countryCount !== 1 ? 'ies' : 'y' }}
+                </div>
+                <div class="ns-hub__pills">
+                  @for (s of group.summary.accountStatuses; track s) {
+                    <span class="badge badge--xs" [class]="accountStatusClass(s)">{{ s }}</span>
                   }
                 </div>
+              </div>
+            </div><!-- /ns-hub -->
 
-                <div class="ns-branches">
+            <!-- ── CLUSTERS (revealed at step >= 1) ──────────────────────── -->
+            @if (revealStep() >= 1) {
+
+              <!-- TOP-LEFT: Bank Accounts -->
+              <div class="ns-cluster ns-cluster--tl ns-cluster--bank">
+                <div class="ns-cluster__title">
+                  <span class="ns-cluster__dot ns-cluster__dot--bank"></span>
+                  Bank Accounts
+                </div>
+                <div class="ns-cluster__cards">
                   @for (rec of group.records; track rec.recordId; let idx = $index) {
                     <div
-                      class="ns-branch"
-                      [class.ns-branch--active]="selectedRecordId() === rec.recordId"
+                      class="ns-card ns-card--bank"
+                      [class.ns-card--active]="selectedRecordId() === rec.recordId"
                       (click)="selectRecord(rec.recordId)"
                     >
-                      <div class="ns-branch__arm"></div>
-                      <div class="ns-branch__index">Rec {{ idx + 1 }}</div>
+                      <div class="ns-card__primary">{{ rec.central.bankAccount }}</div>
+                      <div class="ns-card__secondary">{{ rec.central.accountType }}</div>
+                      <span class="badge badge--xs"
+                            [class]="accountStatusClass(rec.central.accountStatus)">
+                        {{ rec.central.accountStatus }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
 
-                      <!-- Bank Account node -->
-                      <div class="ns-bnode ns-bnode--bank">
-                        <div class="ns-bnode__type">Bank Account</div>
-                        <div class="ns-bnode__value">{{ rec.central.bankAccount }}</div>
-                        <div class="ns-bnode__sub">{{ rec.central.accountType }}</div>
+              <!-- TOP-RIGHT: Recon Accounts -->
+              <div class="ns-cluster ns-cluster--tr ns-cluster--recon">
+                <div class="ns-cluster__title">
+                  <span class="ns-cluster__dot ns-cluster__dot--recon"></span>
+                  Recon Accounts
+                </div>
+                <div class="ns-cluster__cards">
+                  @for (rec of group.records; track rec.recordId) {
+                    <div
+                      class="ns-card ns-card--recon"
+                      [class.ns-card--active]="selectedRecordId() === rec.recordId"
+                      (click)="selectRecord(rec.recordId)"
+                    >
+                      <div class="ns-card__primary">{{ rec.system.reconAccount }}</div>
+                      <div class="ns-card__secondary">{{ rec.system.platform }}</div>
+                      @if (rec.system.database) {
+                        <div class="ns-card__tertiary">{{ rec.system.database }}</div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- BOTTOM-LEFT: Ownership -->
+              <div class="ns-cluster ns-cluster--bl ns-cluster--ao">
+                <div class="ns-cluster__title">
+                  <span class="ns-cluster__dot ns-cluster__dot--ao"></span>
+                  Ownership
+                </div>
+                <div class="ns-cluster__cards">
+                  @for (rec of group.records; track rec.recordId) {
+                    <div
+                      class="ns-card ns-card--ao"
+                      [class.ns-card--active]="selectedRecordId() === rec.recordId"
+                      (click)="selectRecord(rec.recordId)"
+                    >
+                      <div class="ns-card__label">Account Owner</div>
+                      <div class="ns-card__primary">{{ rec.approval.ao.name }}</div>
+                      <div class="ns-card__secondary">{{ rec.approval.ao.soeid }}</div>
+                      @if (rec.approval.ao.status) {
                         <span class="badge badge--xs"
-                              [class]="accountStatusClass(rec.central.accountStatus)">
-                          {{ rec.central.accountStatus }}
+                              [class]="accountStatusClass(rec.approval.ao.status)">
+                          {{ rec.approval.ao.status }}
+                        </span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- BOTTOM-RIGHT: Approval & Review -->
+              <div class="ns-cluster ns-cluster--br ns-cluster--review">
+                <div class="ns-cluster__title">
+                  <span class="ns-cluster__dot ns-cluster__dot--review"></span>
+                  Approval &amp; Review
+                </div>
+                <div class="ns-cluster__cards">
+                  @for (rec of group.records; track rec.recordId) {
+                    <div
+                      class="ns-card ns-card--review"
+                      [class.ns-card--active]="selectedRecordId() === rec.recordId"
+                      (click)="selectRecord(rec.recordId)"
+                    >
+                      @if (rec.approval.po.name) {
+                        <div class="ns-card__label">Proof Owner</div>
+                        <div class="ns-card__primary">{{ rec.approval.po.name }}</div>
+                        <div class="ns-card__secondary">{{ rec.approval.po.soeid }}</div>
+                      }
+                      <div class="ns-card__badges">
+                        <span class="badge badge--xs"
+                              [class]="reviewClass(rec.approval.reviewStatus)">
+                          {{ rec.approval.reviewStatus }}
+                        </span>
+                        <span class="badge badge--xs"
+                              [class]="ddqClass(rec.approval.ddqStatus)">
+                          DDQ: {{ rec.approval.ddqStatus }}
                         </span>
                       </div>
-
-                      <div class="ns-branch__connector"></div>
-
-                      <!-- Recon Account node -->
-                      <div class="ns-bnode ns-bnode--recon">
-                        <div class="ns-bnode__type">Recon Account</div>
-                        <div class="ns-bnode__value">{{ rec.system.reconAccount }}</div>
-                        <div class="ns-bnode__sub">{{ rec.system.platform }}</div>
-                      </div>
-
-                      <div class="ns-branch__connector"></div>
-
-                      <!-- Account Owner node -->
-                      <div class="ns-bnode ns-bnode--ao">
-                        <div class="ns-bnode__type">Account Owner</div>
-                        <div class="ns-bnode__value">{{ rec.approval.ao.name }}</div>
-                        <div class="ns-bnode__sub">{{ rec.approval.ao.soeid }}</div>
-                        @if (rec.approval.ao.status) {
-                          <span class="badge badge--xs"
-                                [class]="accountStatusClass(rec.approval.ao.status)">
-                            {{ rec.approval.ao.status }}
-                          </span>
-                        }
-                      </div>
-
-                      @if (rec.approval.po.name) {
-                        <div class="ns-branch__connector"></div>
-                        <div class="ns-bnode ns-bnode--po">
-                          <div class="ns-bnode__type">Proof Owner</div>
-                          <div class="ns-bnode__value">{{ rec.approval.po.name }}</div>
-                          <div class="ns-bnode__sub">{{ rec.approval.po.soeid }}</div>
-                        </div>
-                      }
-
-                      @if (rec.approval.reviewStatus) {
-                        <div class="ns-branch__connector"></div>
-                        <div class="ns-bnode ns-bnode--review">
-                          <div class="ns-bnode__type">Review</div>
-                          <div class="ns-bnode__value">{{ rec.approval.reviewStatus }}</div>
-                          <div class="ns-bnode__sub">DDQ: {{ rec.approval.ddqStatus }}</div>
-                        </div>
-                      }
-
-                    </div><!-- /ns-branch -->
+                    </div>
                   }
-                </div><!-- /ns-branches -->
+                </div>
+              </div>
 
-              </div><!-- /ns-trunk-area -->
-            }
+            }<!-- /clusters -->
 
           </div><!-- /ns-graph -->
 
