@@ -1,0 +1,169 @@
+{
+  "metadata": {
+    "contractVersion": "1.0.0",
+    "runName": "Daily Trade Recon — 2026-03-30",
+    "runMode": "preview",
+    "submittedBy": "jane.smith@example.com",
+    "createdAt": "2026-03-30T09:00:00Z",
+    "description": "Previewing today's trade-level reconciliation before committing results."
+  },
+
+  "sources": {
+    "left": {
+      "uploadId": "UPL-0012",
+      "label": "Front Office Extract",
+      "fileName": "fo_trades_2026-03-30.csv",
+      "fileType": "csv",
+      "delimiter": ","
+    },
+    "right": {
+      "uploadId": "UPL-0013",
+      "label": "Operations Confirmed",
+      "fileName": "ops_confirms_2026-03-30.xlsx",
+      "fileType": "xlsx",
+      "sheetName": "Confirms"
+    }
+  },
+
+  "mapping": {
+    "pairs": [
+      {
+        "leftField": "TradeId",
+        "rightField": "ConfirmRef",
+        "required": true
+      },
+      {
+        "leftField": "TradeDate",
+        "rightField": "TradeDate",
+        "required": true,
+        "transformation": {
+          "type": "date_format",
+          "params": { "format": "YYYY-MM-DD" }
+        }
+      },
+      {
+        "leftField": "Notional",
+        "rightField": "NotionalAmount",
+        "required": true,
+        "transformation": {
+          "type": "numeric_round",
+          "params": { "decimalPlaces": 2 }
+        }
+      },
+      {
+        "leftField": "Currency",
+        "rightField": "Ccy",
+        "required": true,
+        "transformation": {
+          "type": "uppercase"
+        }
+      },
+      {
+        "leftField": "Counterparty",
+        "rightField": "CptyName",
+        "required": false,
+        "transformation": {
+          "type": "trim"
+        }
+      },
+      {
+        "leftField": "Desk",
+        "rightField": null,
+        "required": false
+      }
+    ]
+  },
+
+  "passes": [
+    {
+      "passId": "PASS-001",
+      "name": "Exact Key Match",
+      "type": "exact",
+      "priority": 1,
+      "enabled": true,
+      "stopOnMatch": true,
+      "description": "Match on TradeId and TradeDate — highest confidence.",
+      "rules": [
+        { "leftField": "TradeId",    "operator": "eq", "rightField": "ConfirmRef" },
+        { "leftField": "TradeDate",  "operator": "eq", "rightField": "TradeDate" }
+      ]
+    },
+    {
+      "passId": "PASS-002",
+      "name": "Amount Tolerance Match",
+      "type": "tolerance",
+      "priority": 2,
+      "enabled": true,
+      "stopOnMatch": true,
+      "description": "Match on key fields with a 0.01 absolute tolerance on Notional.",
+      "rules": [
+        { "leftField": "TradeId",   "operator": "eq",          "rightField": "ConfirmRef" },
+        { "leftField": "Notional",  "operator": "numeric_abs", "rightField": "NotionalAmount" }
+      ],
+      "tolerance": {
+        "type": "absolute",
+        "value": 0.01
+      }
+    },
+    {
+      "passId": "PASS-003",
+      "name": "Currency + Counterparty Fuzzy",
+      "type": "tolerance",
+      "priority": 3,
+      "enabled": true,
+      "stopOnMatch": false,
+      "description": "Broader pass matching on currency and counterparty with a 1 % amount tolerance.",
+      "rules": [
+        { "leftField": "Currency",     "operator": "eq",          "rightField": "Ccy" },
+        { "leftField": "Counterparty", "operator": "contains",    "rightField": "CptyName" },
+        { "leftField": "Notional",     "operator": "numeric_pct", "rightField": "NotionalAmount" }
+      ],
+      "tolerance": {
+        "type": "percentage",
+        "value": 1.0
+      }
+    },
+    {
+      "passId": "PASS-004",
+      "name": "Manual Review",
+      "type": "manual",
+      "priority": 4,
+      "enabled": true,
+      "stopOnMatch": false,
+      "description": "Rows that did not match any prior pass are flagged for manual review.",
+      "rules": []
+    }
+  ],
+
+  "view": {
+    "name": "Standard Trade View",
+    "columns": [
+      { "field": "TradeId",      "source": "left",  "visible": true,  "label": "Trade ID" },
+      { "field": "ConfirmRef",   "source": "right", "visible": true,  "label": "Confirm Ref" },
+      { "field": "TradeDate",    "source": "both",  "visible": true,  "label": "Trade Date" },
+      { "field": "Notional",     "source": "left",  "visible": true,  "label": "Notional (FO)" },
+      { "field": "NotionalAmount","source": "right", "visible": true, "label": "Notional (Ops)" },
+      { "field": "Currency",     "source": "both",  "visible": true,  "label": "Currency" },
+      { "field": "Counterparty", "source": "both",  "visible": true,  "label": "Counterparty" },
+      { "field": "Desk",         "source": "left",  "visible": false }
+    ],
+    "sort": {
+      "field": "TradeDate",
+      "direction": "desc"
+    },
+    "groupBy": {
+      "field": "Currency",
+      "showSubtotals": true
+    },
+    "summaryCards": ["matched", "unmatched", "breaks", "exceptions", "match_rate"],
+    "visibleCategories": ["matched", "unmatched", "breaks", "exceptions"]
+  },
+
+  "execution": {
+    "matchStrategy": "first_match",
+    "allowPartialMatch": false,
+    "generateBreakReport": true,
+    "generateAnalyzerReport": true,
+    "maxPreviewRows": 500
+  }
+}

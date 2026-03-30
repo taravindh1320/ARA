@@ -1,0 +1,129 @@
+{
+  "runId": "PY-EE7D1EA3",
+  "status": "complete",
+  "runMode": "preview",
+  "runName": "Daily Trade Recon \u00e2\u20ac\u201d 2026-03-30",
+  "submittedBy": "jane.smith@example.com",
+  "startedAt": "2026-03-30T11:49:37.038910Z",
+  "finishedAt": "2026-03-30T11:49:37.044434Z",
+  "durationMs": 5,
+  "summary": {
+    "totalLeft": 500,
+    "totalRight": 500,
+    "matched": 499,
+    "unmatched": 1,
+    "breaks": 0,
+    "exceptions": 0,
+    "matchRate": 99.8
+  },
+  "passStats": [
+    {
+      "passId": "PASS-001",
+      "passName": "Exact Key Match",
+      "matchCount": 453,
+      "matchPercentage": 90.6
+    },
+    {
+      "passId": "PASS-002",
+      "passName": "Amount Tolerance Match",
+      "matchCount": 0,
+      "matchPercentage": 0.0
+    },
+    {
+      "passId": "PASS-003",
+      "passName": "Currency + Counterparty Fuzzy",
+      "matchCount": 46,
+      "matchPercentage": 9.2
+    },
+    {
+      "passId": "PASS-004",
+      "passName": "Manual Review",
+      "matchCount": 1,
+      "matchPercentage": 0.2
+    }
+  ],
+  "rows": [
+    {
+      "rowId": "ROW-00001",
+      "status": "matched",
+      "matchedByPass": "PASS-001",
+      "leftKey": "KEY-00001",
+      "rightKey": "KEY-00001",
+      "fieldDifferences": [],
+      "breakReason": null
+    },
+    {
+      "rowId": "ROW-00002",
+      "status": "matched",
+      "matchedByPass": "PASS-001",
+      "leftKey": "KEY-00002",
+      "rightKey": "KEY-00002",
+      "fieldDifferences": [],
+      "breakReason": null
+    },
+    {
+      "rowId": "ROW-00003",
+      "status": "matched",
+      "matchedByPass": "PASS-001",
+      "leftKey": "KEY-00003",
+      "rightKey": "KEY-00003",
+      "fieldDifferences": [],
+      "breakReason": null
+    },
+    {
+      "rowId": "ROW-00004",
+      "status": "matched",
+      "matchedByPass": "PASS-001",
+      "leftKey": "KEY-00004",
+      "rightKey": "KEY-00004",
+      "fieldDifferences": [],
+      "breakReason": null
+    },
+    {
+      "rowId": "ROW-00005",
+      "status": "matched",
+      "matchedByPass": "PASS-001",
+      "leftKey": "KEY-00005",
+      "rightKey": "KEY-00005",
+      "fieldDifferences": [],
+      "breakReason": null
+    }
+  ],
+  "breakReport": {
+    "totalBreaks": 0,
+    "breakReasons": []
+  },
+  "analyzerReport": {
+    "matchByPass": [
+      {
+        "passId": "PASS-001",
+        "passName": "Exact Key Match",
+        "matchCount": 453,
+        "percentage": 90.6
+      },
+      {
+        "passId": "PASS-002",
+        "passName": "Amount Tolerance Match",
+        "matchCount": 0,
+        "percentage": 0.0
+      },
+      {
+        "passId": "PASS-003",
+        "passName": "Currency + Counterparty Fuzzy",
+        "matchCount": 46,
+        "percentage": 9.2
+      },
+      {
+        "passId": "PASS-004",
+        "passName": "Manual Review",
+        "matchCount": 1,
+        "percentage": 0.2
+      }
+    ],
+    "topBreakReasons": [],
+    "exceptionCount": 0,
+    "narrative": "Overall match rate: 99.8%. Pass 'Exact Key Match' was the most productive, accounting for 90.6% of rows."
+  },
+  "message": "Preview complete \u2014 499 matched, 1 unmatched, 0 breaks. No results committed.",
+  "_note": "rows array truncated to 5 for readability; live engine returns up to 50"
+}

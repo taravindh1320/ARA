@@ -11,6 +11,7 @@ import { SelfRecPassesService, PassConfig, PassKey, MatchType, SavePassesRespons
 import { SelfRecViewService, ViewConfig, ViewColumn, SummaryCard, CategoryConfig, SortConfig, GroupConfig, SaveViewResponse } from './self-rec-view.service';
 import { SelfRecRunService, RunRequest, RunResponse, RunSummary } from './self-rec-run.service';
 import { SelfRecResultsService, ResultRow, AnalyzerReport, ResultsResponse } from './self-rec-results.service';
+import { SelfRecPythonRunService } from './self-rec-python-run.service';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -49,8 +50,9 @@ export class SelfRecComponent {
   private readonly mappingService = inject(SelfRecMappingService);
   private readonly passesService  = inject(SelfRecPassesService);
   private readonly viewService    = inject(SelfRecViewService);
-  private readonly runService     = inject(SelfRecRunService);
-  private readonly resultsService = inject(SelfRecResultsService);
+  private readonly runService       = inject(SelfRecRunService);
+  private readonly resultsService   = inject(SelfRecResultsService);
+  private readonly pythonRunService = inject(SelfRecPythonRunService);
 
   readonly theme = araGridTheme;
 
@@ -688,36 +690,35 @@ export class SelfRecComponent {
     const b = this.sourceB();
     if (!a || !b) return;
 
-    const request: RunRequest = {
-      sourceA: { name: a.name, columns: a.columns, rowCount: a.preview.length },
-      sourceB: { name: b.name, columns: b.columns, rowCount: b.preview.length },
-      mapping: {
-        fieldPairs: this.mappedFields,
-        mappingId: this.mappingId() ?? undefined,
-      },
-      passes: this.passes(),
-      view: {
-        name: this.viewName(),
-        columns: this.viewColumns(),
-        sort: this.viewSort() ?? undefined,
-        groupBy: this.viewGroupBy() ?? undefined,
-        summaryCards: this.viewSummaryCards(),
-        categories: this.viewCategories(),
-      },
-      submittedBy: this.submittedBy() || 'anonymous',
-      runMode: this.runMode(),
-    };
-
     this.runStatus.set('running');
     this.runError.set(null);
 
-    this.runService.run(request).subscribe({
-      next: (res: RunResponse) => {
+    this.pythonRunService.run({
+      sourceAName:     a.name,
+      sourceAColumns:  a.columns,
+      sourceBName:     b.name,
+      sourceBColumns:  b.columns,
+      mappingRows:     this.mappingRows(),
+      passes:          this.passes(),
+      viewName:        this.viewName(),
+      viewColumns:     this.viewColumns(),
+      viewSort:        this.viewSort(),
+      viewGroupBy:     this.viewGroupBy(),
+      viewSummaryCards: this.viewSummaryCards(),
+      viewCategories:  this.viewCategories(),
+      submittedBy:     this.submittedBy() || 'anonymous',
+      runMode:         this.runMode(),
+    }).subscribe({
+      next: res => {
         this.runId.set(res.runId);
         this.runSummary.set(res.summary);
         this.runMessage.set(res.message ?? null);
         this.runStatus.set('complete');
-        this.fetchResults();
+        // Python engine returns rows inline — apply directly without a second HTTP call
+        this.resultRows.set(res.rows);
+        this.analyzerData.set(res.analyzerReport);
+        this.sampleNote.set(null);
+        this.resultTab.set('matched');
       },
       error: () => {
         this.runStatus.set('error');
