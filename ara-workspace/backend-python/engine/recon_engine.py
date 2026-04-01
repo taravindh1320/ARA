@@ -4,12 +4,6 @@ ARA Self Rec — Reconciliation Engine
 Core execution loop: loads row data, applies passes in priority order,
 and assembles a ReconRunResult.
 
-── Stub vs real data ────────────────────────────────────────────────────────
-The only method that changes when real data arrives is _load_rows().
-Everything else — the pass loop, statistics, report generation — stays the
-same.  Replacing _load_rows() to read from uploaded CSV/XLSX files is the
-entire stitching task for a future sprint.
-
 ── Pass execution model ──────────────────────────────────────────────────────
 Passes are sorted by priority (lowest integer first) and applied in order.
 If a pass matches a row pair AND stopOnMatch is True, the row is not
@@ -20,11 +14,16 @@ them unmatched.
 
 from __future__ import annotations
 
-import random
+import logging
+import os
 import time
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 
+import pandas as pd
+
+from engine.file_resolver import FileResolver
 from engine.pass_evaluator import PassEvalResult, PassEvaluator
 from models.recon_run_contract import PassType, ReconPass, ReconRunPayload, RunMode
 from models.recon_run_result import (
@@ -40,6 +39,8 @@ from models.recon_run_result import (
     RunStatus,
     RunSummary,
 )
+
+logger = logging.getLogger(__name__)
 
 # Maximum number of ResultRow objects included in the response payload.
 # The full reconciliation is counted; only this many rows are serialised.
@@ -299,7 +300,7 @@ class ReconEngine:
             breakReason=None,
         )
 
-    # ── data loading (stub) ──────────────────────────────────────────────────
+    # ── data loading ────────────────────────────────────────────────────────
 
     def _load_rows(
         self,
@@ -307,116 +308,66 @@ class ReconEngine:
         total_rows: int,
     ) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
         """
-        STUB — generates synthetic row pairs from the mapping configuration.
+        Load left and right source files from disk and return them as
+        lists of row dicts keyed by the *payload mapping field names*.
 
-        ── Replacing this stub ───────────────────────────────────────────────
-        1. Use payload.sources.left.upload_id and .right.upload_id to locate
-           the uploaded files in your storage layer.
-        2. Load each file into a pandas DataFrame (or similar).
-        3. Rename columns according to payload.mapping.pairs so that
-           left_row keys match PassRule.left_field, etc.
-        4. Apply any field transformations declared in mapping.pairs.
-        5. Return two lists of row dicts — one per source side.
+        The CSV/XLSX column names are the raw file headers; after loading,
+        each column that appears in a mapping pair is renamed so that:
+          • left rows are keyed by left_field
+          • right rows are keyed by right_field
 
-        The pass loop and result assembly below do not change.
+        Rows are truncated to *total_rows* when running in preview mode.
         """
-        rng = random.Random(hash(payload.metadata.run_name) & 0xFFFF_FFFF)
+        left_path = FileResolver.resolve(payload.sources.left, label="left")
+        right_path = FileResolver.resolve(payload.sources.right, label="right")
 
-        mapped = [
-            (p.left_field, p.right_field)
-            for p in payload.mapping.pairs
-            if p.right_field is not None
-        ]
+        left_df = self._read_file(left_path)
+        right_df = self._read_file(right_path)
 
-        left_rows: list[dict[str, str]] = []
-        right_rows: list[dict[str, str]] = []
+        logger.info(
+            "Loaded left=%s (%d rows), right=%s (%d rows)",
+            left_path.name, len(left_df),
+            right_path.name, len(right_df),
+        )
 
-        for i in range(total_rows):
-            r = rng.random()
-            if r < 0.68:
-                scenario = "exact"
-            elif r < 0.82:
-                scenario = "tolerance"
-            elif r < 0.91:
-                scenario = "break"
-            elif r < 0.96:
-                scenario = "left_only"
-            else:
-                scenario = "right_only"
+        # Apply preview row cap
+        left_df = left_df.head(total_rows)
+        right_df = right_df.head(total_rows)
 
-            lrow: dict[str, str] = {}
-            rrow: dict[str, str] = {}
+        # Build column rename maps from the original file headers to the
+        # field names used in the pass rules.
+        left_rename: dict[str, str] = {}
+        right_rename: dict[str, str] = {}
+        for pair in payload.mapping.pairs:
+            if pair.right_field is None:
+                continue
+            # Only rename if the field name differs from the column header.
+            # The mapping left_field IS the column name from Source A, and
+            # right_field IS the column name from Source B (as set by the
+            # user during the mapping step).
+            left_rename[pair.left_field] = pair.left_field
+            right_rename[pair.right_field] = pair.right_field
 
-            for lf, rf in mapped:
-                lv, rv = self._synthetic_pair(lf, rf, i, scenario, rng)
-                lrow[lf] = lv
-                rrow[rf] = rv
+        # Convert all values to strings for uniform downstream comparison.
+        left_df = left_df.astype(str)
+        right_df = right_df.astype(str)
 
-            left_rows.append(lrow)
-            right_rows.append(rrow)
+        left_rows = left_df.to_dict(orient="records")  # type: ignore[arg-type]
+        right_rows = right_df.to_dict(orient="records")  # type: ignore[arg-type]
 
-        return left_rows, right_rows
+        return left_rows, right_rows  # type: ignore[return-value]
 
-    def _synthetic_pair(
-        self,
-        left_field: str,
-        right_field: str,
-        index: int,
-        scenario: str,
-        rng: random.Random,
-    ) -> tuple[str, str]:
-        """
-        Produces a (left_value, right_value) pair whose content is driven
-        by the field name archetype and the row scenario.
-        """
-        row_num = index + 1
-        lf = left_field.lower()
-
-        # ── identifier / key fields ──────────────────────────────────────────
-        if any(k in lf for k in ("id", "ref", "key", "trade", "confirm", "num")):
-            shared_key = f"KEY-{row_num:05d}"
-            if scenario in ("left_only", "right_only"):
-                return shared_key, f"KEY-{row_num + 90_000:05d}"
-            return shared_key, shared_key
-
-        # ── date fields ──────────────────────────────────────────────────────
-        if any(k in lf for k in ("date", "dt", "day")):
-            lv = "2026-03-30"
-            rv = "2026-03-29" if scenario == "break" else "2026-03-30"
-            return lv, rv
-
-        # ── numeric / amount fields ──────────────────────────────────────────
-        if any(k in lf for k in ("notional", "amount", "amt", "price", "prc", "value", "val", "qty")):
-            base = round(rng.uniform(10_000, 5_000_000), 2)
-            lv = f"{base:.2f}"
-            if scenario == "exact":
-                rv = lv
-            elif scenario == "tolerance":
-                # Small difference — within a 0.01 absolute tolerance
-                delta = round(rng.uniform(0.001, 0.009), 4)
-                rv = f"{base + delta:.2f}"
-            else:
-                # Larger difference — outside any declared tolerance
-                delta = round(rng.uniform(500.0, 5_000.0), 2)
-                rv = f"{base + delta:.2f}"
-            return lv, rv
-
-        # ── currency fields ───────────────────────────────────────────────────
-        if any(k in lf for k in ("ccy", "currency", "curr")):
-            ccy = rng.choice(["USD", "EUR", "GBP", "JPY", "CHF"])
-            return ccy, ccy
-
-        # ── party / counterparty fields ───────────────────────────────────────
-        if any(k in lf for k in ("party", "cpty", "counterparty", "entity", "account", "acct")):
-            parties = ["Goldman Sachs", "JP Morgan", "Barclays", "Deutsche Bank", "HSBC"]
-            party = rng.choice(parties)
-            rv = party.split()[0] if scenario == "break" else party
-            return party, rv
-
-        # ── generic fallback ─────────────────────────────────────────────────
-        lv = f"{left_field}_{row_num}"
-        rv = f"{right_field}_{row_num}" if scenario != "break" else f"{right_field}_DIFF"
-        return lv, rv
+    @staticmethod
+    def _read_file(path: Path) -> pd.DataFrame:
+        """Read a CSV, TSV, or Excel file into a DataFrame."""
+        ext = path.suffix.lower()
+        if ext == ".csv":
+            return pd.read_csv(path, dtype=str, keep_default_na=False)
+        if ext == ".tsv":
+            return pd.read_csv(path, sep="\t", dtype=str, keep_default_na=False)
+        if ext in (".xlsx", ".xls"):
+            return pd.read_excel(path, dtype=str)
+        raise ValueError(f"Unsupported file type: {ext!r} ({path})")
 
     # ── report builders ──────────────────────────────────────────────────────
 

@@ -25,6 +25,7 @@ export interface RecStep {
 export interface UploadedFile {
   name: string;
   size: number;
+  uploadId?: string;
   columns: string[];
   preview: string[][];
   status: 'uploading' | 'ready' | 'error';
@@ -216,7 +217,7 @@ export class SelfRecComponent {
 
     this.uploadService.upload(file, source).subscribe({
       next: (res: UploadResponse) =>
-        slot.set({ name: res.name, size: res.size, columns: res.columns, preview: res.preview, status: 'ready' }),
+        slot.set({ name: res.name, size: res.size, uploadId: res.uploadId, columns: res.columns, preview: res.preview, status: 'ready' }),
       error: (err: Error) =>
         slot.set({ name: file.name, size: file.size, columns: [], preview: [], status: 'error', error: err.message }),
     });
@@ -695,8 +696,10 @@ export class SelfRecComponent {
 
     this.pythonRunService.run({
       sourceAName:     a.name,
+      sourceAUploadId: a.uploadId,
       sourceAColumns:  a.columns,
       sourceBName:     b.name,
+      sourceBUploadId: b.uploadId,
       sourceBColumns:  b.columns,
       mappingRows:     this.mappingRows(),
       passes:          this.passes(),

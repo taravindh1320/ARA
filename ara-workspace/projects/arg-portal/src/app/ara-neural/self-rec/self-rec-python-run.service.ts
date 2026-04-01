@@ -14,8 +14,10 @@ import { ResultRow, AnalyzerReport } from './self-rec-results.service';
 
 export interface PythonRunInput {
   sourceAName: string;
+  sourceAUploadId?: string;
   sourceAColumns: string[];
   sourceBName: string;
+  sourceBUploadId?: string;
   sourceBColumns: string[];
   mappingRows: MappingRow[];
   passes: PassConfig[];
@@ -134,11 +136,13 @@ export class SelfRecPythonRunService {
           label: 'Source A',
           fileName: input.sourceAName,
           fileType: this.detectFileType(input.sourceAName),
+          ...(input.sourceAUploadId ? { uploadId: input.sourceAUploadId } : {}),
         },
         right: {
           label: 'Source B',
           fileName: input.sourceBName,
           fileType: this.detectFileType(input.sourceBName),
+          ...(input.sourceBUploadId ? { uploadId: input.sourceBUploadId } : {}),
         },
       },
       mapping: {

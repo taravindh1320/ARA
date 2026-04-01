@@ -6,6 +6,7 @@ export interface UploadResponse {
   source: 'A' | 'B';
   name: string;
   size: number;
+  uploadId: string;
   columns: string[];
   preview: string[][];
 }

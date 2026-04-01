@@ -1,9 +1,34 @@
 import multer from 'multer';
 import { Request, Response } from 'express';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as crypto from 'crypto';
 
-// ── Multer — memory storage (no disk writes) ─────────────────────────────────
+// ── Upload directory — shared with the Python engine ────────────────────────
+// Resolved relative to the backend package root so it works regardless of
+// the working directory the process is started from.
+const UPLOAD_DIR = path.resolve(__dirname, '..', '..', '..', 'uploads');
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+
+// In-memory index: uploadId → absolute file path on disk
+// (good enough for the current single-process dev setup)
+const uploadStore = new Map<string, string>();
+
+export function resolveUploadPath(uploadId: string): string | undefined {
+  return uploadStore.get(uploadId);
+}
+
+// ── Multer — disk storage so Python can read the file ───────────────────────
 const upload = multer({
-  storage: multer.memoryStorage(),
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
+    filename: (_req, file, cb) => {
+      const id = crypto.randomUUID();
+      // Preserve the original extension
+      const ext = path.extname(file.originalname).toLowerCase() || '.csv';
+      cb(null, `${id}${ext}`);
+    },
+  }),
   limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB max
 });
 
@@ -11,6 +36,7 @@ export interface UploadResult {
   source: string;
   name: string;
   size: number;
+  uploadId: string;
   columns: string[];
   preview: string[][];
 }
@@ -48,12 +74,22 @@ export class SelfRecController {
       return;
     }
 
-    const { columns, preview } = parseCSVPreview(req.file.buffer);
+    // req.file.path is the absolute path written by multer disk storage.
+    // Derive the uploadId from the generated filename (UUID portion).
+    const uploadId = path.basename(req.file.filename, path.extname(req.file.filename));
+    uploadStore.set(uploadId, req.file.path);
+
+    console.log(`[Upload] source=${source} uploadId=${uploadId} path=${req.file.path}`);
+
+    // Read the saved file from disk for the CSV preview
+    const buffer = fs.readFileSync(req.file.path);
+    const { columns, preview } = parseCSVPreview(buffer);
 
     const result: UploadResult = {
       source,
       name: req.file.originalname,
       size: req.file.size,
+      uploadId,
       columns,
       preview,
     };
